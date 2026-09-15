@@ -1,0 +1,2411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>了凡乐享 · 管理端（小程序后台管理系统）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --p900:#260C55; --p800:#33126C; --p700:#3F1680; --p600:#4A1C90; --p500:#5B26A8;
+  --p400:#7C3AED; --p300:#A98CF0; --p150:#D6CBF2; --p50:#F3EEFD;
+  --orange:#F0632B; --orange2:#FA8A2E; --orange-soft:#FFF3EA;
+  --red:#EF4444; --green:#0F9E56; --blue:#2563EB; --amber:#D97706; --violet:#7C3AED;
+  --bg:#F5F6FA; --card:#FFFFFF; --line:#EEF0F4; --line2:#E6E8EE;
+  --txt:#1B1B26; --txt2:#5C5C70; --txt3:#9A9AAC; --txt4:#C2C4CF;
+  --r:14px; --r-lg:16px; --r-sm:10px;
+  --sh:0 1px 2px rgba(19,20,40,.04),0 6px 20px rgba(19,20,40,.05);
+  --sh-lg:0 12px 40px rgba(24,20,60,.16);
+  --sb:220px; --tb:60px;
+}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--txt);font-size:13px;-webkit-font-smoothing:antialiased;overflow:hidden}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#D8DBE3;border-radius:8px}
+::-webkit-scrollbar-thumb:hover{background:#C2C6D0}
+::-webkit-scrollbar-track{background:transparent}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit;outline:none}
+button{cursor:pointer;border:none;background:none}
+table{border-collapse:collapse;width:100%}
+.num{font-variant-numeric:tabular-nums}
+
+/* ===================== 布局 ===================== */
+.app{display:flex;height:100vh;width:100%}
+/* ---- 侧边栏 ---- */
+.sidebar{width:var(--sb);flex-shrink:0;display:flex;flex-direction:column;
+  background:linear-gradient(180deg,#2A0E5C 0%,#38136F 42%,#42187F 72%,#4A1C90 100%);color:#fff;overflow:hidden}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:16px 16px 14px;flex-shrink:0}
+.sb-logo .mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#FF9A3D,#F0532B);
+  display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:900;color:#fff;
+  box-shadow:0 4px 12px rgba(240,83,43,.4);flex-shrink:0}
+.sb-logo .tt{min-width:0}
+.sb-logo .tt b{display:block;font-size:15px;font-weight:800;letter-spacing:.3px}
+.sb-logo .tt span{display:block;font-size:10px;color:#B9A5E8;margin-top:2px;letter-spacing:.2px}
+.sb-nav{flex:1;overflow-y:auto;padding:4px 10px 14px}
+.sb-nav::-webkit-scrollbar{width:0}
+.sb-group{font-size:10.5px;font-weight:700;color:#9C86DA;letter-spacing:.6px;padding:14px 10px 7px}
+.sb-item{display:flex;align-items:center;gap:9px;height:38px;padding:0 10px;border-radius:10px;
+  color:#D3C7F0;font-size:12.5px;font-weight:600;cursor:pointer;position:relative;transition:background .16s,color .16s;margin-bottom:1px}
+.sb-item svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;opacity:.95}
+.sb-item .lb{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-item .bg{min-width:19px;height:18px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;
+  font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-item:hover{background:rgba(255,255,255,.09);color:#fff}
+.sb-item.on{background:rgba(255,255,255,.15);color:#fff;font-weight:700}
+.sb-item.on::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:2px;
+  background:linear-gradient(180deg,#FF8A3D,#F0532B)}
+.sb-user{margin:8px 10px 12px;padding:9px 10px;border-radius:12px;background:rgba(255,255,255,.11);
+  display:flex;align-items:center;gap:9px;cursor:pointer;flex-shrink:0}
+.sb-user .av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#B07BFF,#F0532B);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.sb-user .bd{flex:1;min-width:0}
+.sb-user .bd b{display:block;font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user .bd span{display:block;font-size:10px;color:#B9A5E8;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user .arr{color:#B9A5E8;font-size:13px}
+
+/* ---- 主区 ---- */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:var(--tb);flex-shrink:0;background:#fff;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:16px;padding:0 22px}
+.crumb{display:flex;align-items:center;gap:7px;font-size:13px;flex-shrink:0}
+.crumb .b{color:var(--p600);font-weight:800}
+.crumb .s{color:var(--txt3)}
+.crumb .c{font-weight:700}
+.tb-search{flex:1;max-width:420px;height:34px;background:#F5F6FA;border-radius:999px;display:flex;align-items:center;
+  gap:8px;padding:0 14px;transition:box-shadow .16s,background .16s}
+.tb-search:focus-within{background:#fff;box-shadow:0 0 0 2px rgba(124,58,237,.18)}
+.tb-search svg{width:15px;height:15px;stroke:var(--txt3);fill:none;stroke-width:2;flex-shrink:0}
+.tb-search input{flex:1;border:none;background:none;font-size:12.5px}
+.tb-search input::placeholder{color:var(--txt4)}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.icon-btn{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;position:relative;
+  transition:background .16s}
+.icon-btn:hover{background:#F5F6FA}
+.icon-btn svg{width:18px;height:18px;stroke:var(--txt2);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.icon-btn .dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--red);
+  border:1.5px solid #fff}
+
+.content{flex:1;overflow-y:auto;padding:20px 22px 44px}
+.page{display:none}
+.page.on{display:block;animation:fade .22s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ===================== 组件 ===================== */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
+.ph h1{font-size:19px;font-weight:800;letter-spacing:.2px}
+.ph .sub{font-size:12px;color:var(--txt3);margin-top:5px;line-height:1.6}
+.ph .acts{display:flex;align-items:center;gap:9px;flex-shrink:0}
+
+.btn{height:34px;padding:0 15px;border-radius:9px;font-size:12.5px;font-weight:700;display:inline-flex;
+  align-items:center;gap:6px;transition:all .15s;white-space:nowrap;border:1px solid transparent}
+.btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn-primary{background:linear-gradient(135deg,#FA8A2E,#F0532B);color:#fff;box-shadow:0 3px 10px rgba(240,83,43,.28)}
+.btn-primary:hover{filter:brightness(1.05);box-shadow:0 5px 16px rgba(240,83,43,.36)}
+.btn-primary:active{transform:translateY(1px)}
+.btn-ghost{background:#fff;border-color:var(--line2);color:var(--txt2)}
+.btn-ghost:hover{border-color:#CFD3DD;color:var(--txt);background:#FCFCFD}
+.btn-violet{background:var(--p600);color:#fff}
+.btn-violet:hover{background:var(--p500)}
+.btn-danger{background:#FDECEC;color:#E14343}
+.btn-danger:hover{background:#FBDCDC}
+.btn-sm{height:28px;padding:0 11px;font-size:11.5px;border-radius:8px}
+.btn[disabled]{opacity:.5;pointer-events:none}
+
+.card{background:var(--card);border-radius:var(--r-lg);box-shadow:var(--sh)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.stat{background:#fff;border-radius:var(--r-lg);box-shadow:var(--sh);padding:16px 16px 15px;position:relative;overflow:hidden}
+.stat .lb{font-size:12.5px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:6px}
+.stat .vl{font-size:30px;font-weight:900;letter-spacing:-.5px;margin-top:9px;line-height:1.1;display:flex;align-items:baseline;gap:5px}
+.stat .vl small{font-size:13px;font-weight:700;color:var(--txt2)}
+.stat .sb{font-size:11.5px;margin-top:7px;font-weight:600;color:var(--txt3);display:flex;align-items:center;gap:5px}
+.stat .sb.up{color:#E14343}
+.stat .sb.down{color:var(--green)}
+.stat .sb.hl{color:var(--orange)}
+.stat .ico{position:absolute;right:16px;top:15px;width:30px;height:30px}
+.stat .ico svg{width:30px;height:30px;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+.panel{background:#fff;border-radius:var(--r-lg);box-shadow:var(--sh);overflow:hidden;margin-bottom:16px}
+.pn-head{padding:14px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.pn-head .tt{font-size:14px;font-weight:800;display:flex;align-items:center;gap:7px}
+.pn-head .tt em{font-style:normal;font-size:11.5px;font-weight:600;color:var(--txt3)}
+.pn-head .sp{margin-left:auto;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.pn-head.plain{border-bottom:none;padding-bottom:4px}
+
+.sel{height:32px;border:1px solid var(--line2);border-radius:9px;background:#fff;padding:0 26px 0 11px;font-size:12.5px;
+  color:var(--txt2);font-weight:600;appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239A9AAC' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat:no-repeat;background-position:right 9px center}
+.sel:hover{border-color:#CFD3DD}
+.sel:focus{border-color:var(--p400);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+.search-sm{height:32px;border:1px solid var(--line2);border-radius:9px;padding:0 12px;font-size:12.5px;width:210px;background:#fff}
+.search-sm:focus{border-color:var(--p400);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+.search-sm::placeholder{color:var(--txt4)}
+.hit{padding:10px 16px;font-size:12px;color:var(--txt3);display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#FCFCFE;border-bottom:1px solid var(--line)}
+.hit b{color:var(--orange);font-weight:800}
+.hit .ck{margin-left:auto;font-weight:700;color:var(--p600)}
+
+/* ---- 表格 ---- */
+.tw{overflow-x:auto}
+.tb{min-width:100%}
+.tb th{background:#FAFAFC;color:var(--txt2);font-size:12px;font-weight:700;text-align:left;padding:11px 14px;
+  white-space:nowrap;border-bottom:1px solid var(--line)}
+.tb th:first-child,.tb td:first-child{padding-left:16px}
+.tb td{padding:13px 14px;border-bottom:1px solid var(--line);font-size:12.5px;vertical-align:middle;color:var(--txt2)}
+.tb tbody tr:hover{background:#FBFBFE}
+.tb tbody tr:last-child td{border-bottom:none}
+.tb .cb{width:16px;height:16px;accent-color:var(--p600);cursor:pointer;vertical-align:-3px}
+.c-main{min-width:170px;max-width:330px}
+.c-main .t{font-size:13px;font-weight:700;color:var(--txt);line-height:1.45}
+.c-main .s{font-size:11.5px;color:var(--txt3);margin-top:3px;line-height:1.5}
+.c-main .t a{color:var(--txt)}
+.c-main .t a:hover{color:var(--p600)}
+.tag{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:5px;vertical-align:1px;margin-left:5px}
+.c-person{display:flex;align-items:center;gap:8px}
+.c-person .av{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;color:#fff;
+  background:linear-gradient(135deg,#8B5CF6,#5B26A8)}
+.c-person .nm{font-size:12.5px;font-weight:700;color:var(--txt);line-height:1.3}
+.c-person .sub{font-size:11px;color:var(--txt3);margin-top:2px}
+.c-person .rl{font-size:11px;color:var(--txt3);margin-top:1px}
+.flt{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:13px 16px;border-bottom:1px solid var(--line);background:#FBFBFD}
+.flt .ipt{height:32px;border:1px solid var(--line2);border-radius:9px;padding:0 12px;font-size:12.5px;background:#fff;color:var(--txt)}
+.flt .ipt:focus{border-color:var(--p400);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+.flt .sep{color:var(--txt3);font-size:12.5px}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:7px;white-space:nowrap}
+.pill.green{background:#E8F7EF;color:#0F9E56}
+.pill.amber{background:#FFF5E6;color:#C2700A}
+.pill.blue{background:#EAF1FF;color:#2563EB}
+.pill.red{background:#FDECEC;color:#DC3B3B}
+.pill.violet{background:#F2EAFE;color:#7C3AED}
+.pill.gray{background:#F2F3F7;color:#6B7280}
+.lk{color:var(--orange);font-weight:700;font-size:12.5px;display:inline-flex;align-items:center;gap:3px}
+.lk:hover{text-decoration:underline}
+.ops{display:flex;align-items:center;gap:7px;white-space:nowrap}
+.bar{height:5px;border-radius:3px;background:#F0F1F5;overflow:hidden;min-width:64px;margin-top:6px}
+.tb td .bar{max-width:150px}
+.bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,#FA8A2E,#F0532B)}
+.bar.v i{background:linear-gradient(90deg,#A78BFA,#7C3AED)}
+.money{font-weight:800;color:var(--txt);font-variant-numeric:tabular-nums}
+.money.o{color:var(--orange)}
+.money.up{color:#E14343}
+.money.down{color:var(--green)}
+
+.pager{display:flex;align-items:center;gap:8px;padding:13px 16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--txt3)}
+.pager .sp{margin-left:auto;display:flex;align-items:center;gap:6px}
+.pg{min-width:29px;height:29px;border-radius:8px;border:1px solid var(--line2);background:#fff;font-size:12px;font-weight:700;
+  color:var(--txt2);display:inline-flex;align-items:center;justify-content:center;padding:0 8px}
+.pg:hover{border-color:#CFD3DD}
+.pg.on{background:var(--p600);border-color:var(--p600);color:#fff}
+.pg[disabled]{opacity:.45;pointer-events:none}
+.empty{padding:56px 16px;text-align:center;color:var(--txt3);font-size:12.5px}
+.empty .em{font-size:34px;margin-bottom:10px;opacity:.5}
+
+/* ---- 表单 ---- */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+.fi{display:flex;flex-direction:column;gap:6px}
+.fi.full{grid-column:1/-1}
+.fi label{font-size:12.5px;font-weight:700;color:var(--txt2)}
+.fi label i{color:var(--red);font-style:normal;margin-left:2px}
+.fi input,.fi select,.fi textarea{height:38px;border:1px solid var(--line2);border-radius:10px;padding:0 12px;background:#fff;font-size:12.5px}
+.fi textarea{height:auto;min-height:76px;padding:10px 12px;resize:vertical;line-height:1.6}
+.fi input:focus,.fi select:focus,.fi textarea:focus{border-color:var(--p400);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+.fi .hint{font-size:11px;color:var(--txt3);line-height:1.5}
+.switch{width:42px;height:24px;border-radius:12px;background:#DFE2E9;position:relative;transition:background .18s;flex-shrink:0;cursor:pointer}
+.switch i{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .18s;
+  box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.switch.on{background:var(--p600)}
+.switch.on i{left:21px}
+.chk{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--txt2);cursor:pointer}
+.chk input{width:16px;height:16px;accent-color:var(--p600)}
+.seg{display:inline-flex;background:#F2F3F7;border-radius:10px;padding:3px;gap:2px}
+.seg button{height:28px;padding:0 14px;border-radius:8px;font-size:12px;font-weight:700;color:var(--txt2)}
+.seg button.on{background:#fff;color:var(--p600);box-shadow:0 1px 4px rgba(20,20,50,.1)}
+.tabs{display:flex;gap:22px;border-bottom:1px solid var(--line);padding:0 16px}
+.tabs button{height:44px;font-size:13px;font-weight:700;color:var(--txt3);position:relative}
+.tabs button.on{color:var(--p600)}
+.tabs button.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;border-radius:2px;background:var(--p600)}
+
+/* ---- 图表 ---- */
+.chart-grid{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:16px}
+.chart-grid.g3{grid-template-columns:1fr 1fr 1fr}
+.chart-box{padding:14px 16px 8px}
+.chart-box .tt{font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:2px}
+.chart-box .tt .lg{font-size:11px;color:var(--txt3);font-weight:600;display:flex;align-items:center;gap:10px}
+.chart-box .tt .lg s{width:8px;height:8px;border-radius:3px;display:inline-block;margin-right:4px;text-decoration:none}
+.chart-box svg{display:block;width:100%;overflow:visible}
+.rank-li{display:flex;align-items:center;gap:11px;padding:10px 16px;border-bottom:1px solid var(--line)}
+.rank-li:last-child{border-bottom:none}
+.rank-li .no{width:20px;height:20px;border-radius:6px;background:#F2F3F7;color:var(--txt2);font-size:11px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rank-li .no.t1{background:linear-gradient(135deg,#FFB020,#F0532B);color:#fff}
+.rank-li .no.t2{background:linear-gradient(135deg,#C9CFDC,#8E97A8);color:#fff}
+.rank-li .no.t3{background:linear-gradient(135deg,#E4A87A,#C77B45);color:#fff}
+.rank-li .nm{flex:1;min-width:0;font-size:12.5px;font-weight:700;color:var(--txt)}
+.rank-li .nm span{display:block;font-size:11px;color:var(--txt3);font-weight:500;margin-top:2px}
+.rank-li .vv{font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums}
+.todo-li{display:flex;align-items:center;gap:11px;padding:11px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+.todo-li:last-child{border-bottom:none}
+.todo-li:hover{background:#FBFBFE}
+.todo-li .ic{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.todo-li .bd{flex:1;min-width:0}
+.todo-li .bd b{display:block;font-size:12.5px;font-weight:700}
+.todo-li .bd span{display:block;font-size:11px;color:var(--txt3);margin-top:3px}
+.todo-li .arr{color:var(--txt4);font-size:15px}
+
+/* ---- 弹窗 / 抽屉 ---- */
+.mask{position:fixed;inset:0;background:rgba(22,18,45,.42);backdrop-filter:blur(2px);z-index:80;
+  display:none;align-items:center;justify-content:center;padding:24px}
+.mask.on{display:flex;animation:fade .18s ease}
+.modal{background:#fff;border-radius:18px;box-shadow:var(--sh-lg);width:600px;max-width:100%;max-height:90vh;
+  display:flex;flex-direction:column;animation:pop .2s cubic-bezier(.2,.9,.3,1.2)}
+.modal.wide{width:820px}
+@keyframes pop{from{opacity:0;transform:scale(.94) translateY(10px)}to{opacity:1;transform:none}}
+.md-head{padding:17px 20px 14px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:12px}
+.md-head h3{font-size:15.5px;font-weight:800;flex:1}
+.md-head .sub{font-size:11.5px;color:var(--txt3);margin-top:4px;font-weight:500}
+.md-head .x{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--txt3);flex-shrink:0}
+.md-head .x:hover{background:#F2F3F7;color:var(--txt)}
+.md-body{padding:18px 20px;overflow-y:auto}
+.md-foot{padding:14px 20px;border-top:1px solid var(--line);display:flex;align-items:center;gap:9px;justify-content:flex-end}
+.md-foot .lf{margin-right:auto;font-size:11.5px;color:var(--txt3)}
+
+.drawer{position:fixed;top:0;right:0;bottom:0;width:660px;max-width:100%;background:#fff;z-index:81;
+  box-shadow:-14px 0 44px rgba(24,20,60,.18);display:none;flex-direction:column}
+.drawer.on{display:flex;animation:slide .24s cubic-bezier(.2,.85,.3,1)}
+@keyframes slide{from{transform:translateX(40px);opacity:.4}to{transform:none;opacity:1}}
+.dw-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
+.dw-head h3{font-size:15.5px;font-weight:800;flex:1}
+.dw-body{flex:1;overflow-y:auto;padding:0}
+.dw-foot{padding:13px 20px;border-top:1px solid var(--line);display:flex;gap:9px;justify-content:flex-end}
+.kv{display:grid;grid-template-columns:102px 1fr;gap:11px 14px;padding:16px 20px;font-size:12.5px}
+.kv .k{color:var(--txt3);font-weight:600}
+.kv .v{color:var(--txt);font-weight:600}
+.sec-t{font-size:12.5px;font-weight:800;padding:14px 20px 9px;color:var(--txt);display:flex;align-items:center;gap:8px}
+.sec-t::before{content:"";width:3px;height:13px;border-radius:2px;background:var(--p600)}
+
+/* ---- 组织树 ---- */
+.tree{padding:8px 16px 20px}
+.tree-node{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer}
+.tree-node:hover{background:#F8F8FC}
+.tree-node .tg{width:16px;text-align:center;color:var(--txt3);font-size:11px}
+.tree-node .nm{flex:1}
+.tree-node .mt{font-size:11.5px;color:var(--txt3);font-weight:600}
+.tree-l1{margin-left:0}.tree-l2{margin-left:22px}.tree-l3{margin-left:44px}
+
+/* ---- 权限矩阵 ---- */
+.matrix th:first-child,.matrix td:first-child{width:200px}
+.matrix thead th{position:sticky;top:0;z-index:3;box-shadow:0 1px 0 var(--line)}
+.matrix td{text-align:center}
+.matrix td:first-child{text-align:left}
+.matrix input{width:16px;height:16px;accent-color:var(--p600);cursor:pointer}
+
+/* ---- 券包配置 ---- */
+.vp-row{display:grid;grid-template-columns:120px 100px 110px 1fr;gap:12px;align-items:center;padding:11px 16px;border-bottom:1px solid var(--line)}
+.vp-row:last-child{border-bottom:none}
+.vp-row.head{background:#FAFAFC;font-size:11.5px;font-weight:700;color:var(--txt2)}
+.vp-row .nm{font-size:12.5px;font-weight:700}
+.vp-row input{height:34px;border:1px solid var(--line2);border-radius:9px;padding:0 10px;font-size:12.5px;width:100%;
+  font-weight:700;color:var(--orange);font-variant-numeric:tabular-nums}
+.vp-row input:focus{border-color:var(--p400);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+.vp-row .calc{font-size:11.5px;color:var(--txt3)}
+.vp-row .calc b{color:var(--txt);font-weight:800}
+
+/* ---- 排班网格 ---- */
+.sch{overflow-x:auto;padding:0 0 8px}
+.sch table{min-width:760px}
+.sch th{background:#FAFAFC;font-size:11.5px;font-weight:700;color:var(--txt2);padding:10px 12px;border-bottom:1px solid var(--line);text-align:center}
+.sch th:first-child{text-align:left;width:150px}
+.sch td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:center;font-size:12.5px}
+.sch td:first-child{text-align:left}
+.sch .cell{height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;cursor:pointer}
+.sch .cell.work{background:#EAF1FF;color:#2563EB}
+.sch .cell.half{background:#FFF5E6;color:#C2700A}
+.sch .cell.off{background:#F2F3F7;color:#9A9AAC}
+.sch .cell:hover{outline:2px solid rgba(124,58,237,.35);outline-offset:-2px}
+
+/* ---- toast ---- */
+.toast{position:fixed;left:50%;bottom:40px;transform:translate(-50%,14px);background:#1E1B33;color:#fff;
+  padding:11px 20px;border-radius:12px;font-size:12.5px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.28);
+  z-index:120;opacity:0;pointer-events:none;transition:all .22s;max-width:80vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+.hint-box{display:flex;gap:9px;padding:11px 14px;border-radius:11px;background:var(--p50);color:#5B26A8;
+  font-size:11.5px;line-height:1.65;font-weight:600;margin-bottom:14px}
+.hint-box.orange{background:var(--orange-soft);color:#B4431C}
+.hint-box em{font-style:normal;font-weight:800}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="mark">了</div>
+      <div class="tt"><b>了凡乐享</b><span>小程序后台管理系统 · 管理端</span></div>
+    </div>
+    <nav class="sb-nav" id="sbNav"></nav>
+    <div class="sb-user" onclick="openProfile()">
+      <div class="av">超</div>
+      <div class="bd"><b>超级管理员</b><span>王立群 · 集团总部</span></div>
+      <div class="arr">›</div>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <div class="crumb" id="crumb"></div>
+      <div class="tb-search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="globalSearch" placeholder="搜索门店、员工、用户、订单、评价…" onkeydown="if(event.key==='Enter')globalSearchGo()">
+      </div>
+      <div class="tb-right">
+        <button class="icon-btn" onclick="openTodoDrawer()" title="待办提醒">
+          <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+          <span class="dot"></span>
+        </button>
+        <button class="icon-btn" onclick="toast('已切换全屏预览（原型演示）')" title="全屏">
+          <svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+        </button>
+        <button class="btn btn-primary" onclick="syncMp()">
+          <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 4v5h-5"/></svg>
+          同步小程序
+        </button>
+      </div>
+    </header>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<div class="mask" id="mask" onclick="if(event.target===this)closeModal()"><div class="modal" id="modal"></div></div>
+<div class="mask" id="dmask" onclick="if(event.target===this)closeDrawer()"></div>
+<div class="drawer" id="drawer"></div>
+<div class="toast" id="toast"></div>
+<script>
+/* ============================================================
+   了凡乐享 · 小程序后台管理系统（管理端原型）
+   单文件实现：菜单 / 页面 / 表格 / 表单 / 弹窗 / 抽屉 / 图表
+   ============================================================ */
+
+/* ---------- 图标库（线性 SVG，stroke 随文字色） ---------- */
+const ICON={
+grid:'<path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>',
+sitemap:'<rect x="9" y="3" width="6" height="4" rx="1"/><rect x="2" y="17" width="6" height="4" rx="1"/><rect x="16" y="17" width="6" height="4" rx="1"/><path d="M12 7v5M5 17v-3h14v3"/>',
+store:'<path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v11h16V9"/><path d="M9 20v-5h6v5"/>',
+users:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c1.1-3.1 3.4-4.6 6-4.6s4.9 1.5 6 4.6"/><path d="M16.2 5.4a3 3 0 010 5.4"/><path d="M17.6 15.6c1.7.6 2.9 2 3.4 4.4"/>',
+userHeart:'<circle cx="10" cy="8" r="3.2"/><path d="M3 20c1.1-3.1 3.4-4.6 7-4.6"/><path d="M17.5 20s-3.5-2.2-3.5-4.6a1.9 1.9 0 013.5-1.1 1.9 1.9 0 013.5 1.1c0 2.4-3.5 4.6-3.5 4.6z"/>',
+medal:'<circle cx="12" cy="14" r="5"/><path d="M9 9L7 3h10l-2 6"/><path d="M12 12.4v3.2"/>',
+calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+clip:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>',
+box:'<path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/>',
+receipt:'<path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 7h6M9 11h6"/>',
+card:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/>',
+clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+ticket:'<path d="M3 8a2 2 0 012-2h14a2 2 0 012 2 2 2 0 000 4 2 2 0 010 4 2 2 0 01-2 2H5a2 2 0 01-2-2 2 2 0 000-4 2 2 0 010-4z"/><path d="M12 7v1M12 12v1M12 16v1"/>',
+gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13"/><path d="M12 8S10.6 3 8.2 3.6 8.6 8 12 8zM12 8s1.4-5 3.8-4.4S15.4 8 12 8z"/>',
+coin:'<circle cx="12" cy="12" r="9"/><path d="M14.6 9.3A3 3 0 0012 8a3 3 0 000 8 3 3 0 002.6-1.3M9 11h5M9 13.5h5"/>',
+share:'<circle cx="17" cy="5" r="2.6"/><circle cx="7" cy="12" r="2.6"/><circle cx="17" cy="19" r="2.6"/><path d="M9.3 10.7l5.4-3.4M9.3 13.3l5.4 3.4"/>',
+wallet:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16.5 14.5h1.5"/>',
+megaphone:'<path d="M4 10v4a1 1 0 001 1h2l8 4V5L7 9H5a1 1 0 00-1 1z"/><path d="M18 9a4 4 0 010 6M8 15v4"/>',
+star:'<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z"/>',
+alert:'<path d="M12 4l8.5 15h-17z"/><path d="M12 10v4M12 16.6v.4"/>',
+checkCircle:'<circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5.5-5.5"/>',
+doc:'<path d="M6 2h8l4 4v16H6z"/><path d="M14 2v5h4M9 13h6M9 17h4"/>',
+bell:'<path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/>',
+shield:'<path d="M12 3l8 3v6c0 4.6-3.2 8.2-8 9.5C7.2 20.2 4 16.6 4 12V6z"/><path d="M9.5 12.5l2 2 3.5-3.5"/>',
+key:'<circle cx="8" cy="13" r="4"/><path d="M11.8 10.2L20 2M17 5l2.5 2.5"/>',
+list:'<path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>',
+gear:'<circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 00.3 1.9l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-2.9 1.2 2 2 0 11-4 0 1.7 1.7 0 00-2.9-1.2l-.1.1a2 2 0 11-2.8-2.8l.1-.1A1.7 1.7 0 003 15a2 2 0 010-4 1.7 1.7 0 001.2-2.9l-.1-.1a2 2 0 112.8-2.8l.1.1A1.7 1.7 0 0010 4.2a2 2 0 014 0 1.7 1.7 0 002.9 1.2l.1-.1a2 2 0 112.8 2.8l-.1.1A1.7 1.7 0 0021 11a2 2 0 010 4z"/>',
+plus:'<path d="M12 5v14M5 12h14"/>',
+download:'<path d="M12 3v12M7.5 10.5L12 15l4.5-4.5M4 20h16"/>',
+edit:'<path d="M4 20h4l10-10-4-4L4 16z"/><path d="M14 6l4 4"/>',
+eye:'<path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14"/>',
+link:'<path d="M10 13a5 5 0 007.5.5l2-2A5 5 0 0012.5 4.5L11 6"/><path d="M14 11a5 5 0 00-7.5-.5l-2 2A5 5 0 0011.5 19.5L13 18"/>',
+userCheck:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c1.1-3.1 3.4-4.6 6-4.6 1.6 0 3 .5 4.2 1.4"/><path d="M15.5 18l1.8 1.8L21 16"/>',
+money:'<path d="M12 3v18"/><path d="M17 7.5c0-1.9-2.2-3-5-3s-5 1.1-5 3S9.2 11 12 11s5 1.1 5 3-2.2 3-5 3-5-1.1-5-3"/>'
+};
+function svgIcon(n,size,color,sw){return '<svg viewBox="0 0 24 24" '+(size?'width="'+size+'" height="'+size+'" ':'')+
+  'style="fill:none;stroke:'+(color||'currentColor')+';stroke-width:'+(sw||2)+';stroke-linecap:round;stroke-linejoin:round">'+(ICON[n]||ICON.grid)+'</svg>';}
+
+/* ---------- 菜单结构（27 个模块 / 5 大分组） ---------- */
+const MENU=[
+  {g:'管理中心',items:['dashboard','org','stores','staff','members','therapists']},
+  {g:'业务运营',items:['services','goods','appts','orders','cards','schedule']},
+  {g:'营销中心',items:['coupons','voucher','points','distributors','withdrawals','campaigns']},
+  {g:'服务质控',items:['reviews','complaints','evalTasks','content','notifications']},
+  {g:'系统设置',items:['roles','accounts','logs','settings']}
+];
+const MOD={
+  dashboard:{n:'数据看板',i:'grid',k:'dash'},
+  org:{n:'组织架构',i:'sitemap',k:'org'},
+  stores:{n:'门店管理',i:'store',b:12,k:'table'},
+  staff:{n:'员工管理',i:'users',k:'table'},
+  members:{n:'用户管理',i:'userHeart',k:'table'},
+  therapists:{n:'康复师管理',i:'medal',k:'table'},
+  services:{n:'服务项目',i:'clip',k:'table'},
+  goods:{n:'商品与套餐',i:'box',k:'table'},
+  appts:{n:'预约管理',i:'calendar',b:8,k:'table'},
+  orders:{n:'订单管理',i:'receipt',b:5,k:'table'},
+  cards:{n:'卡项与核销',i:'card',k:'table'},
+  schedule:{n:'排班管理',i:'clock',k:'schedule'},
+  coupons:{n:'优惠券管理',i:'ticket',k:'table'},
+  voucher:{n:'券包配置',i:'gift',k:'voucher'},
+  points:{n:'积点与成长值',i:'coin',k:'points'},
+  distributors:{n:'分销推广员',i:'share',k:'table'},
+  withdrawals:{n:'提现审核',i:'wallet',b:5,k:'table'},
+  campaigns:{n:'营销活动',i:'megaphone',k:'table'},
+  reviews:{n:'评价管理',i:'star',b:27,k:'table'},
+  complaints:{n:'投诉工单',i:'alert',k:'table'},
+  evalTasks:{n:'门店互评任务',i:'checkCircle',b:3,k:'eval'},
+  content:{n:'内容与推广',i:'doc',k:'content'},
+  notifications:{n:'消息与推送',i:'bell',k:'table'},
+  roles:{n:'角色权限',i:'shield',k:'roles'},
+  accounts:{n:'后台账号',i:'key',k:'table'},
+  logs:{n:'操作日志',i:'list',k:'table'},
+  settings:{n:'系统设置',i:'gear',k:'settings'}
+};
+
+/* ---------- 状态色 ---------- */
+const PILL={'已发布':'green','营业中':'green','正常':'green','已完成':'green','已通过':'green','已发放':'green','已处理':'green',
+'在售':'green','上架中':'green','已上架':'green','已核销':'green','在职':'green','已结算':'green','已回复':'green','已领取':'green',
+'审核中':'amber','待审核':'amber','筹备中':'amber','待处理':'amber','待打款':'amber','待核销':'amber','待回访':'amber','待评价':'amber','体检中':'amber','待审批':'amber',
+'进行中':'blue','使用中':'blue','已生效':'blue','已推送':'blue',
+'已停用':'gray','已过期':'gray','已下架':'gray','已关闭':'gray','已退款':'gray','已驳回':'gray','休假':'gray','休息':'gray','离职':'gray','已隐藏':'gray','草稿':'gray','已结束':'gray','已用尽':'gray',
+'已拒绝':'red','异常':'red','退款中':'amber','待缴清':'red','超时未到':'red','待分配':'red'};
+
+/* ============================================================
+   表格模块数据（17 个通用表格模块）
+   ============================================================ */
+const T={
+
+/* ---------------- 门店管理 ---------------- */
+stores:{key:'id',addLb:'新增门店',addForm:'store',
+ sub:'维护门店档案、营业时间、服务项目与经营状态；小程序端门店详情与可预约门店均取此数据',
+ stats:[
+  {lb:'门店总数',vl:'12',u:'家',sb:'营业中 10 · 筹备 1 · 停用 1',i:'store',c:'#7C3AED'},
+  {lb:'本月新增门店',vl:'2',u:'家',sb:'环比上月 +1 家',i:'plus',c:'#2563EB',cls:'hl'},
+  {lb:'本月门店总营收',vl:'¥286.4万',sb:'环比 +12.6%',i:'money',c:'#F0532B',cls:'up'},
+  {lb:'单店月均营收',vl:'¥23.9万',sb:'低于均值 3 家',i:'grid',c:'#0F9E56'}
+ ],
+ filters:[{k:'city',l:'城市',o:['全部城市','长沙','武汉','深圳','广州','成都']},
+          {k:'status',l:'状态',o:['全部状态','营业中','筹备中','已停用']},
+          {k:'type',l:'类型',o:['全部类型','直营','合作']}],
+ sk:['name','city','manager'],
+ cols:[{k:'name',t:'门店名称',ty:'main',sub:'addr'},
+       {k:'city',t:'城市',ty:'text'},
+       {k:'manager',t:'店长',ty:'person',sub:'managerPhone'},
+       {k:'staff',t:'员工数',ty:'num',unit:'人'},
+       {k:'rooms',t:'诊室',ty:'num',unit:'间'},
+       {k:'gmv',t:'本月营收',ty:'money',o:1},
+       {k:'rate',t:'月目标达成',ty:'bar',k2:'gmvNum'},
+       {k:'status',t:'状态',ty:'pill'},
+       {k:'ops',t:'操作',ty:'ops'}],
+ ops:[{t:'编辑',fn:'edit'},{t:'排班',fn:'go:schedule'},{t:'停用',fn:'toggle'}],
+ rows:[
+  {id:'ST001',name:'长沙岳麓中心店',addr:'岳麓区枫林三路 238 号 3 层 · 长沙',city:'长沙',type:'直营',manager:'王立群',managerPhone:'138****6621',staff:12,rooms:8,gmv:'¥38.6万',gmvNum:38.6,rate:86,status:'营业中'},
+  {id:'ST002',name:'长沙谷山店',addr:'望城区谷山路 88 号 2 层 · 长沙',city:'长沙',type:'直营',manager:'周强',managerPhone:'139****3382',staff:9,rooms:6,gmv:'¥26.2万',gmvNum:26.2,rate:76,status:'营业中'},
+  {id:'ST003',name:'长沙梅溪湖店',addr:'岳麓区梅溪湖路 199 号 4 层 · 长沙',city:'长沙',type:'合作',manager:'李明',managerPhone:'137****9910',staff:7,rooms:5,gmv:'¥18.4万',gmvNum:18.4,rate:62,status:'营业中'},
+  {id:'ST004',name:'武汉光谷店',addr:'洪山区关山大道 588 号 5 层 · 武汉',city:'武汉',type:'直营',manager:'赵静',managerPhone:'186****4417',staff:11,rooms:7,gmv:'¥33.8万',gmvNum:33.8,rate:81,status:'营业中'},
+  {id:'ST005',name:'武汉汉街店',addr:'武昌区中北路 109 号 3 层 · 武汉',city:'武汉',type:'合作',manager:'孙磊',managerPhone:'185****2231',staff:6,rooms:5,gmv:'¥15.9万',gmvNum:15.9,rate:58,status:'营业中'},
+  {id:'ST006',name:'深圳南山旗舰店',addr:'南山区科苑南路 2888 号 8 层 · 深圳',city:'深圳',type:'直营',manager:'陈思远',managerPhone:'135****7788',staff:15,rooms:10,gmv:'¥52.1万',gmvNum:52.1,rate:94,status:'营业中'},
+  {id:'ST007',name:'深圳福田中心店',addr:'福田区福华三路 128 号 2 层 · 深圳',city:'深圳',type:'直营',manager:'林妍',managerPhone:'136****5566',staff:10,rooms:6,gmv:'¥31.5万',gmvNum:31.5,rate:79,status:'营业中'},
+  {id:'ST008',name:'广州天河店',addr:'天河区体育东路 122 号 6 层 · 广州',city:'广州',type:'合作',manager:'黄志强',managerPhone:'133****1122',staff:8,rooms:6,gmv:'¥22.7万',gmvNum:22.7,rate:68,status:'营业中'},
+  {id:'ST009',name:'广州珠江新城店',addr:'天河区华夏路 30 号 5 层 · 广州',city:'广州',type:'直营',manager:'吴静怡',managerPhone:'132****3344',staff:9,rooms:7,gmv:'¥27.3万',gmvNum:27.3,rate:74,status:'营业中'},
+  {id:'ST010',name:'成都天府三街店',addr:'高新区天府三街 69 号 4 层 · 成都',city:'成都',type:'合作',manager:'郑凯',managerPhone:'131****8899',staff:6,rooms:4,gmv:'¥13.6万',gmvNum:13.6,rate:51,status:'营业中'},
+  {id:'ST011',name:'长沙高铁南站店',addr:'雨花区黎托街道花侯路 8 号 · 长沙',city:'长沙',type:'直营',manager:'待定',managerPhone:'—',staff:0,rooms:5,gmv:'—',gmvNum:0,rate:0,status:'筹备中'},
+  {id:'ST012',name:'武汉江汉路店',addr:'江汉区江汉路 118 号 2 层 · 武汉',city:'武汉',type:'合作',manager:'孙磊',managerPhone:'185****2231',staff:3,rooms:3,gmv:'¥2.1万',gmvNum:2.1,rate:12,status:'已停用'}
+ ],
+ form:[{k:'name',l:'门店名称',t:'text',req:1},{k:'city',l:'城市',t:'select',o:['长沙','武汉','深圳','广州','成都']},
+       {k:'type',l:'门店类型',t:'select',o:['直营','合作']},{k:'manager',l:'店长',t:'text'},
+       {k:'managerPhone',l:'店长手机号',t:'text'},{k:'rooms',l:'诊室数量',t:'num'},
+       {k:'addr',l:'详细地址',t:'text',full:1},{k:'status',l:'经营状态',t:'select',o:['营业中','筹备中','已停用']},
+       {k:'note',l:'门店简介（小程序端展示）',t:'textarea',full:1}]
+},
+
+/* ---------------- 员工管理 ---------------- */
+staff:{key:'id',addLb:'新增员工',addForm:'staff',
+ sub:'员工账号即小程序员工端登录账号；角色决定工作台可见的快捷操作与数据范围',
+ stats:[
+  {lb:'员工总数',vl:'96',u:'人',sb:'在职 91 · 休假 3 · 离职 2',i:'users',c:'#7C3AED'},
+  {lb:'康复师',vl:'58',u:'人',sb:'其中首席/专家 9 人',i:'medal',c:'#F0532B'},
+  {lb:'前台与店长',vl:'38',u:'人',sb:'店长 12 · 前台 26',i:'userCheck',c:'#2563EB'},
+  {lb:'本月新入职',vl:'7',u:'人',sb:'待完善档案 2 人',i:'plus',c:'#0F9E56',cls:'hl'}
+ ],
+ filters:[{k:'store',l:'所属门店',o:['全部门店','长沙岳麓中心店','长沙谷山店','深圳南山旗舰店','武汉光谷店']},
+          {k:'role',l:'角色',o:['全部角色','康复师','前台','店长']},
+          {k:'status',l:'状态',o:['全部状态','在职','休假','离职']}],
+ sk:['name','phone','store'],
+ cols:[{k:'name',t:'姓名 / 工号',ty:'main',sub:'id'},
+       {k:'store',t:'所属门店',ty:'text'},
+       {k:'role',t:'角色',ty:'pill'},
+       {k:'title',t:'职级',ty:'text'},
+       {k:'phone',t:'手机号',ty:'text'},
+       {k:'join',t:'入职日期',ty:'text'},
+       {k:'perf',t:'本月绩效',ty:'main2',sub:'perfNote'},
+       {k:'status',t:'状态',ty:'pill'},
+       {k:'ops',t:'操作',ty:'ops'}],
+ ops:[{t:'编辑',fn:'edit'},{t:'绩效',fn:'go:therapists'},{t:'停用',fn:'toggle'}],
+ rows:[
+  {id:'E1001',name:'王兴权',store:'长沙岳麓中心店',role:'康复师',title:'首席康复师',phone:'138****1001',join:'2023-04-12',perf:'S · 96 人次',perfNote:'运动损伤方向 · 达标率 128%',status:'在职'},
+  {id:'E1002',name:'李娜',store:'长沙岳麓中心店',role:'康复师',title:'资深康复师',phone:'139****1002',join:'2023-08-01',perf:'A · 88 人次',perfNote:'颈肩腰腿痛方向 · 达标率 112%',status:'在职'},
+  {id:'E1003',name:'刘洋',store:'长沙谷山店',role:'康复师',title:'康复专家',phone:'137****1003',join:'2022-11-20',perf:'S · 118 人次',perfNote:'脑科学训练方向 · 达标率 142%',status:'在职'},
+  {id:'E1004',name:'唐琪',store:'深圳南山旗舰店',role:'康复师',title:'高级康复师',phone:'135****1004',join:'2024-02-15',perf:'A · 92 人次',perfNote:'术后康复方向 · 达标率 118%',status:'在职'},
+  {id:'E1005',name:'张敏',store:'长沙岳麓中心店',role:'前台',title:'前台主管',phone:'136****1005',join:'2023-06-08',perf:'A · 核销 412 单',perfNote:'月度核销准确率 100%',status:'在职'},
+  {id:'E1006',name:'王立群',store:'长沙岳麓中心店',role:'店长',title:'区域店长',phone:'138****6621',join:'2022-03-01',perf:'A · 营收达成 86%',perfNote:'管理 2 家门店',status:'在职'},
+  {id:'E1007',name:'周强',store:'长沙谷山店',role:'店长',title:'店长',phone:'139****3382',join:'2023-01-10',perf:'B · 营收达成 76%',perfNote:'互评得分 4.6',status:'在职'},
+  {id:'E1008',name:'冯娟',store:'长沙梅溪湖店',role:'康复师',title:'康复师',phone:'137****1008',join:'2024-05-06',perf:'B · 62 人次',perfNote:'体态矫正方向 · 达标率 88%',status:'休假'},
+  {id:'E1009',name:'韩刚',store:'武汉光谷店',role:'康复师',title:'高级康复师',phone:'186****1009',join:'2023-09-18',perf:'A · 84 人次',perfNote:'拉伸放松方向 · 达标率 106%',status:'在职'},
+  {id:'E1010',name:'刘婷',store:'武汉汉街店',role:'前台',title:'前台',phone:'185****1010',join:'2025-03-02',perf:'B · 核销 268 单',perfNote:'待完成服务流程培训',status:'在职'}
+ ],
+ form:[{k:'name',l:'姓名',t:'text',req:1},{k:'phone',l:'手机号',t:'text',req:1},
+       {k:'store',l:'所属门店',t:'select',o:['长沙岳麓中心店','长沙谷山店','长沙梅溪湖店','武汉光谷店','武汉汉街店','深圳南山旗舰店','深圳福田中心店','广州天河店']},
+       {k:'role',l:'角色',t:'select',o:['康复师','前台','店长']},
+       {k:'title',l:'职级',t:'text'},{k:'join',l:'入职日期',t:'date'},
+       {k:'status',l:'状态',t:'select',o:['在职','休假','离职']},
+       {k:'perfNote',l:'备注 / 擅长方向',t:'textarea',full:1}]
+},
+
+/* ---------------- 用户管理 ---------------- */
+members:{key:'id',addLb:'新增用户',addForm:'member',
+ sub:'小程序端注册用户（会员）档案；卡项、积点、成长值、优惠券均在此查看与调整',
+ stats:[
+  {lb:'累计注册用户',vl:'19,268',u:'人',sb:'本月新增 1,286 人',i:'userHeart',c:'#7C3AED'},
+  {lb:'活跃用户（30 天）',vl:'6,412',u:'人',sb:'活跃率 33.3%',i:'grid',c:'#2563EB'},
+  {lb:'付费会员',vl:'4,187',u:'人',sb:'付费转化 21.7%',i:'money',c:'#F0532B',cls:'up'},
+  {lb:'卡项在途余额',vl:'¥486.2万',u:'',sb:'涉及 12 家门店',i:'card',c:'#0F9E56'}
+ ],
+ filters:[{k:'level',l:'会员等级',o:['全部等级','普通会员','银卡','金卡','黑金']},
+          {k:'store',l:'归属门店',o:['全部门店','长沙岳麓中心店','长沙谷山店','深圳南山旗舰店']},
+          {k:'status',l:'状态',o:['全部状态','正常','异常']}],
+ sk:['name','phone'],
+ cols:[{k:'name',t:'用户 / 手机号',ty:'main',sub:'phone'},
+       {k:'level',t:'会员等级',ty:'pill'},
+       {k:'store',t:'归属门店',ty:'text'},
+       {k:'cards',t:'剩余卡次',ty:'num',unit:'次'},
+       {k:'points',t:'积点',ty:'num'},
+       {k:'growth',t:'成长值',ty:'num'},
+       {k:'spend',t:'累计消费',ty:'money',o:1},
+       {k:'last',t:'最近到店',ty:'text'},
+       {k:'status',t:'状态',ty:'pill'},
+       {k:'ops',t:'操作',ty:'ops'}],
+ ops:[{t:'详情',fn:'detail'},{t:'调积点',fn:'custom:points'},{t:'冻结',fn:'toggle'}],
+ rows:[
+  {id:'U2001',name:'林小凡',phone:'138****2001',level:'黑金',store:'长沙岳麓中心店',cards:12,points:2680,growth:8860,spend:'¥42,860',last:'2026-09-14',status:'正常'},
+  {id:'U2002',name:'王小明',phone:'139****2002',level:'银卡',store:'长沙谷山店',cards:4,points:620,growth:2140,spend:'¥9,240',last:'2026-09-13',status:'正常'},
+  {id:'U2003',name:'陈一鸣',phone:'137****2003',level:'金卡',store:'长沙岳麓中心店',cards:7,points:1180,growth:4620,spend:'¥18,600',last:'2026-09-12',status:'正常'},
+  {id:'U2004',name:'周雨彤',phone:'136****2004',level:'金卡',store:'深圳南山旗舰店',cards:9,points:1560,growth:5380,spend:'¥22,180',last:'2026-09-15',status:'正常'},
+  {id:'U2005',name:'刘亦辰',phone:'135****2005',level:'普通会员',store:'武汉光谷店',cards:1,points:210,growth:380,spend:'¥1,980',last:'2026-09-10',status:'正常'},
+  {id:'U2006',name:'李佳',phone:'133****2006',level:'银卡',store:'广州天河店',cards:3,points:840,growth:2760,spend:'¥7,860',last:'2026-08-30',status:'正常'},
+  {id:'U2007',name:'黄思远',phone:'132****2007',level:'普通会员',store:'成都天府三街店',cards:0,points:60,growth:120,spend:'¥560',last:'2026-08-18',status:'正常'},
+  {id:'U2008',name:'杨阳',phone:'131****2008',level:'普通会员',store:'长沙梅溪湖店',cards:2,points:320,growth:640,spend:'¥3,200',last:'2026-09-01',status:'异常'},
+  {id:'U2009',name:'赵婷婷',phone:'130****2009',level:'银卡',store:'长沙岳麓中心店',cards:5,points:980,growth:3240,spend:'¥11,400',last:'2026-09-08',status:'正常'}
+ ],
+ form:[{k:'name',l:'姓名',t:'text',req:1},{k:'phone',l:'手机号',t:'text',req:1},
+       {k:'level',l:'会员等级',t:'select',o:['普通会员','银卡','金卡','黑金']},
+       {k:'store',l:'归属门店',t:'select',o:['长沙岳麓中心店','长沙谷山店','长沙梅溪湖店','武汉光谷店','深圳南山旗舰店','广州天河店']},
+       {k:'cards',l:'剩余卡次',t:'num'},{k:'points',l:'积点',t:'num'},
+       {k:'growth',l:'成长值',t:'num'},{k:'status',l:'状态',t:'select',o:['正常','异常']},
+       {k:'note',l:'备注',t:'textarea',full:1}]
+},
+
+/* ---------------- 康复师管理 ---------------- */
+therapists:{key:'id',addLb:'新增康复师',addForm:'therapist',
+ sub:'康复师认证资质、擅长方向、等级与绩效目标；决定小程序端康复师列表与可预约范围',
+ stats:[
+  {lb:'康复师总数',vl:'58',u:'人',sb:'首席 4 · 专家 5 · 资深 16',i:'medal',c:'#7C3AED'},
+  {lb:'本月服务人次',vl:'2,846',u:'人次',sb:'环比 +8.4%',i:'grid',c:'#2563EB'},
+  {lb:'平均客户评分',vl:'4.86',u:'分',sb:'满分 5 分 · 参评 1,147 条',i:'star',c:'#F0532B',cls:'hl'},
+  {lb:'绩效达标率',vl:'74%',u:'',sb:'达标 43 人 / 未达标 15 人',i:'checkCircle',c:'#0F9E56'}
+ ],
+ filters:[{k:'store',l:'所属门店',o:['全部门店','长沙岳麓中心店','长沙谷山店','深圳南山旗舰店','武汉光谷店']},
+          {k:'level',l:'等级',o:['全部等级','首席康复师','康复专家','资深康复师','高级康复师','康复师']},
+          {k:'dir',l:'擅长方向',o:['全部方向','运动损伤','术后康复','颈肩腰腿痛','脑科学训练','体态矫正','拉伸放松']}],
+ sk:['name','store'],
+ cols:[{k:'name',t:'康复师',ty:'main',sub:'id'},
+       {k:'level',t:'等级',ty:'pill'},
+       {k:'dir',t:'擅长方向',ty:'text'},
+       {k:'store',t:'所属门店',ty:'text'},
+       {k:'years',t:'从业年限',ty:'num',unit:'年'},
+       {k:'rate',t:'客户评分',ty:'main2',sub:'rateNote'},
+       {k:'target',t:'服务量（月）',ty:'bar',k2:'done'},
+       {k:'status',t:'状态',ty:'pill'},
+       {k:'ops',t:'操作',ty:'ops'}],
+ ops:[{t:'编辑',fn:'edit'},{t:'资质',fn:'detail'},{t:'停用',fn:'toggle'}],
+ rows:[
+  {id:'TH001',name:'刘洋',level:'康复专家',dir:'脑科学训练',store:'长沙谷山店',years:12,rate:'4.95 星',rateNote:'参评 186 条 · 好评率 98%',done:118,target:100,status:'在职'},
+  {id:'TH002',name:'王兴权',level:'首席康复师',dir:'运动损伤',store:'长沙岳麓中心店',years:10,rate:'4.92 星',rateNote:'参评 164 条 · 好评率 97%',done:96,target:90,status:'在职'},
+  {id:'TH003',name:'李娜',level:'资深康复师',dir:'颈肩腰腿痛',store:'长沙岳麓中心店',years:7,rate:'4.88 星',rateNote:'参评 142 条 · 好评率 96%',done:88,target:85,status:'在职'},
+  {id:'TH004',name:'唐琪',level:'高级康复师',dir:'术后康复',store:'深圳南山旗舰店',years:6,rate:'4.86 星',rateNote:'参评 128 条 · 好评率 95%',done:92,target:85,status:'在职'},
+  {id:'TH005',name:'韩刚',level:'高级康复师',dir:'拉伸放松',store:'武汉光谷店',years:5,rate:'4.79 星',rateNote:'参评 96 条 · 好评率 93%',done:84,target:80,status:'在职'},
+  {id:'TH006',name:'冯娟',level:'康复师',dir:'体态矫正',store:'长沙梅溪湖店',years:3,rate:'4.72 星',rateNote:'参评 74 条 · 好评率 92%',done:62,target:70,status:'休假'},
+  {id:'TH007',name:'周倩',level:'康复师',dir:'运动损伤',store:'广州天河店',years:2,rate:'4.68 星',rateNote:'参评 52 条 · 好评率 90%',done:58,target:65,status:'在职'},
+  {id:'TH008',name:'陈昊',level:'康复师',dir:'颈肩腰腿痛',store:'成都天府三街店',years:2,rate:'4.65 星',rateNote:'参评 41 条 · 好评率 88%',done:44,target:60,status:'在职'}
+ ],
+ form:[{k:'name',l:'姓名',t:'text',req:1},{k:'level',l:'等级',t:'select',o:['首席康复师','康复专家','资深康复师','高级康复师','康复师']},
+       {k:'dir',l:'擅长方向',t:'select',o:['运动损伤','术后康复','颈肩腰腿痛','脑科学训练','体态矫正','拉伸放松']},
+       {k:'store',l:'所属门店',t:'select',o:['长沙岳麓中心店','长沙谷山店','长沙梅溪湖店','武汉光谷店','深圳南山旗舰店','广州天河店']},
+       {k:'years',l:'从业年限',t:'num'},{k:'target',l:'月度服务量目标（人次）',t:'num'},
+       {k:'cert',l:'资质证书',t:'text'},{k:'status',l:'状态',t:'select',o:['在职','休假','离职']},
+       {k:'intro',l:'个人简介（小程序端展示）',t:'textarea',full:1}]
+},
+
+/* ---------------- 服务项目 ---------------- */
+services:{key:'id',addLb:'新增服务项目',addForm:'service',
+ sub:'小程序端「服务」列表与预约下单的项目库；价格、时长、可预约门店在此统一维护',
+ stats:[
+  {lb:'服务项目总数',vl:'18',u:'项',sb:'上架 16 · 下架 2',i:'clip',c:'#7C3AED'},
+  {lb:'本月下单最多的项目',vl:'运动损伤康复',u:'',sb:'下单 412 单 · 占比 28%',i:'grid',c:'#2563EB',cls:'hl'},
+  {lb:'本月服务收入',vl:'¥196.8万',sb:'环比 +9.2%',i:'money',c:'#F0532B',cls:'up'},
+  {lb:'平均客单价',vl:'¥486',u:'',sb:'环比 +3.6%',i:'card',c:'#0F9E56'}
+ ],
+ filters:[{k:'cat',l:'项目分类',o:['全部分类','运动损伤','术后康复','慢性疼痛','脑科学训练','放松塑形','评估筛查']},
+          {k:'status',l:'状态',o:['全部状态','上架中','已下架']}],
+ sk:['name'],
+ cols:[{k:'name',t:'服务项目',ty:'main',sub:'id'},
+       {k:'cat',t:'分类',ty:'pill'},
+       {k:'dur',t:'时长',ty:'text'},
+       {k:'price',t:'单人价',ty:'money',o:1},
+       {k:'pkgPrice',t:'套餐均价',ty:'money'},
+       {k:'stores',t:'开通门店',ty:'text'},
+       {k:'sales',t:'本月销量',ty:'num',unit:'单'},
+       {k:'status',t:'状态',ty:'pill'},
+       {k:'ops',t:'操作',ty:'ops'}],
+ ops:[{t:'编辑',fn:'edit'},{t:'预览',fn:'detail'},{t:'下架',fn:'toggle'}],
+ rows:[
+  {id:'SV01',name:'运动损伤康复',cat:'运动损伤',dur:'60 min',price:'¥598',pkgPrice:'¥520',stores:'全部 10 家门店',sales:412,status:'上架中'},
+  {id:'SV02',name:'术后康复训练',cat:'术后康复',dur:'60 min',price:'¥698',pkgPrice:'¥620',stores:'8 家门店',sales:268,status:'上架中'},
+  {id:'SV03',name:'颈肩腰腿痛调理',cat:'慢性疼痛',dur:'60 min',price:'¥528',pkgPrice:'¥460',stores:'全部 10 家门店',sales:386,status:'上架中'},
+  {id:'SV04',name:'脑科学训练',cat:'脑科学训练',dur:'45 min',price:'¥898',pkgPrice:'¥780',stores:'4 家旗舰门店',sales:142,status:'上架中'},
+  {id:'SV05',name:'拉伸放松',cat:'放松塑形',dur:'45 min',price:'¥398',pkgPrice:'¥350',stores:'全部 10 家门店',sales:294,status:'上架中'},
+  {id:'SV06',name:'体态评估',cat:'评估筛查',dur:'30 min',price:'¥298',pkgPrice:'—',stores:'6 家门店',sales:186,status:'上架中'},
+  {id:'SV07',name:'首诊评估（含报告）',cat:'评估筛查',dur:'60 min',price:'¥480',pkgPrice:'—',stores:'全部 10 家门店',sales:230,status:'上架中'},
+  {id:'SV08',name:'青少年体态矫正（青少年专项）',cat:'放松塑形',dur:'45 min',price:'¥460',pkgPrice:'¥398',stores:'3 家门店',sales:76,status:'已下架'}
+ ],
+ form:[{k:'name',l:'项目名称',t:'text',req:1},{k:'cat',l:'项目分类',t:'select',o:['运动损伤','术后康复','慢性疼痛','脑科学训练','放松塑形','评估筛查']},
+       {k:'dur',l:'服务时长',t:'text'},{k:'price',l:'单人价（元）',t:'text'},
+       {k:'pkgPrice',l:'套餐均价（元）',t:'text'},{k:'stores',l:'开通门店',t:'text'},
+       {k:'status',l:'上架状态',t:'select',o:['上架中','已下架']},
+       {k:'desc',l:'项目介绍（小程序端展示）',t:'textarea',full:1}]
+},
+
+/* ---------------- 商品与套餐 ---------------- */
+goods:{key:'id',addLb:'新增商品',addForm:'good',
+ sub:'小程序商城商品与课程套餐（次卡）；课程套餐的券包抵扣规则在「券包配置」中统一设置',
+ stats:[
+  {lb:'在售商品',vl:'26',u:'种',sb:'实物 14 · 课程套餐 12',i:'box',c:'#7C3AED'},
+  {lb:'本月商城订单',vl:'1,286',u:'单',sb:'环比 +14.2%',i:'receipt',c:'#2563EB'},
+  {lb:'本月商城 GMV',vl:'¥68.4万',sb:'课程套餐占比 72%',i:'money',c:'#F0532B',cls:'up'},
+  {lb:'库存预警商品',vl:'3',u:'种',sb:'库存低于 10 件',i:'alert',c:'#EF4444',cls:'up'}
+ ],
+ filters:[{k:'type',l:'类型',o:['全部类型','实物商品','课程套餐']},
+          {k:'status',l:'状态',o:['全部状态','在售','已下架']}],
+ sk:['name'],
+ cols:[{k:'name',t:'商品 / 套餐',ty:'main',sub:'id'},
+       {k:'type',t:'类型',ty:'pill'},
+       {k:'spec',t:'规格',ty:'text'},
+       {k:'origin',t:'原价',ty:'money'},
+       {k:'price',t:'售价',ty:'money',o:1},
+       {k:'stock',t:'库存',ty:'num',unit:'件'},
+       {k:'sales',t:'本月销量',ty:'num',unit:'单'},
+       {k:'status',t:'状态',ty:'pill'},
+       {k:'ops',t:'操作',ty:'ops'}],
+ ops:[{t:'编辑',fn:'edit'},{t:'下架',fn:'toggle'}],
+ rows:[
+  {id:'GD01',name:'10 次课程套餐（运动损伤康复）',type:'课程套餐',spec:'10 次 · 有效期 12 个月',origin:'¥5,980',price:'¥5,000',stock:'不限',sales:86,status:'在售'},
+  {id:'GD02',name:'20 次课程套餐（全项目通用）',type:'课程套餐',spec:'20 次 · 有效期 24 个月',origin:'¥11,960',price:'¥10,000',stock:'不限',sales:42,status:'在售'},
+  {id:'GD03',name:'5 次课程套餐（颈肩腰腿痛调理）',type:'课程套餐',spec:'5 次 · 有效期 6 个月',origin:'¥2,640',price:'¥2,500',stock:'不限',sales:128,status:'在售'},
+  {id:'GD04',name:'3 次体验套餐（新客专享）',type:'课程套餐',spec:'3 次 · 有效期 3 个月',origin:'¥1,794',price:'¥1,500',stock:'不限',sales:196,status:'在售'},
+  {id:'GD05',name:'单次课程券',type:'课程套餐',spec:'1 次 · 有效期 30 天',origin:'¥598',price:'¥500',stock:'不限',sales:246,status:'在售'},
+  {id:'GD06',name:'筋膜枪（专业级）',type:'实物商品',spec:'黑色 / 6 档调节',origin:'¥899',price:'¥699',stock:42,sales:38,status:'在售'},
+  {id:'GD07',name:'泡沫轴（筋膜放松轴）',type:'实物商品',spec:'45cm 中密度',origin:'¥168',price:'¥128',stock:8,sales:64,status:'在售'},
+  {id:'GD08',name:'肌效贴（肌内效贴布）',type:'实物商品',spec:'5cm×5m 单卷',origin:'¥88',price:'¥68',stock:6,sales:82,status:'在售'}
+ ],
+ form:[{k:'name',l:'商品/套餐名称',t:'text',req:1},{k:'type',l:'类型',t:'select',o:['实物商品','课程套餐']},
+       {k:'spec',l:'规格',t:'text'},{k:'origin',l:'原价（元）',t:'text'},
+       {k:'price',l:'售价（元）',t:'text'},{k:'stock',l:'库存',t:'text'},
+       {k:'status',l:'状态',t:'select',o:['在售','已下架']},
+       {k:'desc',l:'商品详情（小程序端展示）',t:'textarea',full:1}]
+},
+
+/* ---------------- 预约管理 ---------------- */
+appts:{key:'id',addLb:'代客预约',addForm:'appt',
+ sub:'全平台预约单；支持改期、取消、更换康复师、标记到店与核销（含用户端提前 2 小时改期规则）',
+ stats:[
+  {lb:'今日预约',vl:'186',u:'单',sb:'已到店 142 · 未到店 44',i:'calendar',c:'#7C3AED'},
+  {lb:'待核销',vl:'8',u:'单',sb:'超时未到 2 单需处理',i:'alert',c:'#EF4444',cls:'up'},
+  {lb:'本周改期单',vl:'34',u:'单',sb:'改期率 4.2%',i:'clock',c:'#2563EB'},
+  {lb:'爽约率（月）',vl:'2.8%',u:'',sb:'环比 -0.6%',i:'checkCircle',c:'#0F9E56'}
+ ],
+ filters:[{k:'store',l:'门店',o:['全部门店','长沙岳麓中心店','长沙谷山店','深圳南山旗舰店','武汉光谷店']},
+          {k:'status',l:'状态',o:['全部状态','待核销','已完成','已改期','已取消','超时未到']},
+          {k:'date',l:'日期',o:['今日','明日','本周','全部']}],
+ sk:['member','therapist'],
+ cols:[{k:'id',t:'预约单号',ty:'main',sub:'created'},
+       {k:'member',t:'客户',ty:'person',sub:'memberLv'},
+       {k:'svc',t:'服务项目',ty:'text'},
+       {k:'therapist',t:'康复师',ty:'text'},
+       {k:'store',t:'门店',ty:'text'},
+       {k:'time',t:'预约时间',ty:'main2',sub:'dur'},
+       {k:'source',t:'来源',ty:'pill'},
+       {k:'status',t:'状态',ty:'pill'},
+       {k:'ops',t:'操作',ty:'ops'}],
+ ops:[{t:'改期',fn:'custom:reschedule'},{t:'取消',fn:'custom:cancel'},{t:'核销',fn:'custom:verify'}],
+ rows:[
+  {id:'AP20260915001',created:'09-14 18:22 提交',member:'林小凡',memberLv:'黑金会员',svc:'运动损伤康复 · 60min',therapist:'王兴权',store:'长沙岳麓中心店',time:'09-15 10:00',dur:'60 min',source:'用户端',status:'已完成'},
+  {id:'AP20260915002',created:'09-14 20:05 提交',member:'王小明',memberLv:'银卡会员',svc:'术后康复训练 · 60min',therapist:'李娜',store:'长沙岳麓中心店',time:'09-15 14:00',dur:'60 min',source:'用户端',status:'待核销'},
+  {id:'AP20260915003',created:'09-15 08:12 提交',member:'陈一鸣',memberLv:'金卡会员',svc:'拉伸放松 · 45min',therapist:'韩刚',store:'长沙谷山店',time:'09-15 15:00',dur:'45 min',source:'前台代约',status:'待核销'},
+  {id:'AP20260915004',created:'09-13 11:40 提交',member:'周雨彤',memberLv:'金卡会员',svc:'颈肩腰腿痛调理 · 60min',therapist:'唐琪',store:'深圳南山旗舰店',time:'09-15 16:30',dur:'60 min',source:'用户端',status:'已改期'},
+  {id:'AP20260915005',created:'09-12 09:30 提交',member:'刘亦辰',memberLv:'普通会员',svc:'体态评估 · 30min',therapist:'韩刚',store:'武汉光谷店',time:'09-15 11:00',dur:'30 min',source:'用户端',status:'已取消'},
+  {id:'AP20260915006',created:'09-15 07:50 提交',member:'李佳',memberLv:'银卡会员',svc:'运动损伤康复 · 60min',therapist:'周倩',store:'广州天河店',time:'09-15 09:30',dur:'60 min',source:'用户端',status:'超时未到'},
+  {id:'AP20260915007',created:'09-15 09:02 提交',member:'赵婷婷',memberLv:'银卡会员',svc:'脑科学训练 · 45min',therapist:'刘洋',store:'长沙谷山店',time:'09-15 17:00',dur:'45 min',source:'用户端',status:'待核销'},
+  {id:'AP20260915008',created:'09-14 14:18 提交',member:'黄思远',memberLv:'普通会员',svc:'首诊评估（含报告）· 60min',therapist:'冯娟',store:'长沙梅溪湖店',time:'09-15 19:00',dur:'60 min',source:'用户端',status:'待核销'}
+ ],
+ form:[{k:'member',l:'客户',t:'text',req:1},{k:'svc',l:'服务项目',t:'select',o:['运动损伤康复 · 60min','术后康复训练 · 60min','颈肩腰腿痛调理 · 60min','脑科学训练 · 45min','拉伸放松 · 45min','体态评估 · 30min']},
+       {k:'therapist',l:'康复师',t:'select',o:['王兴权','李娜','刘洋','唐琪','韩刚','冯娟']},
+       {k:'store',l:'门店',t:'select',o:['长沙岳麓中心店','长沙谷山店','长沙梅溪湖店','武汉光谷店','深圳南山旗舰店','广州天河店']},
+       {k:'time',l:'预约时间',t:'text'},{k:'source',l:'来源',t:'select',o:['用户端','前台代约']},
+       {k:'status',l:'状态',t:'select',o:['待核销','已完成','已改期','已取消']},
+       {k:'remark',l:'备注（改期原因等）',t:'textarea',full:1}]
+},
+
+/* ---------------- 订单管理 ---------------- */
+orders:{key:'id',addLb:'手动建单',addForm:'order',
+ sub:'全平台订单（课程套餐 / 实物商品 / 券包抵扣）；退款申请在此审核，审核后同步门店与用户端',
+ stats:[
+  {lb:'今日订单',vl:'318',u:'单',sb:'今日 GMV ¥18.6万',i:'receipt',c:'#7C3AED'},
+  {lb:'待发货',vl:'12',u:'单',sb:'实物商品订单',i:'box',c:'#2563EB'},
+  {lb:'退款待审核',vl:'5',u:'单',sb:'涉及金额 ¥1.86万',i:'alert',c:'#EF4444',cls:'up'},
+  {lb:'本月 GMV',vl:'¥286.4万',sb:'环比 +12.6%',i:'money',c:'#F0532B',cls:'up'}
+ ],
+ filters:[{k:'type',l:'订单类型',o:['全部类型','课程套餐','实物商品']},
+          {k:'status',l:'状态',o:['全部状态','已完成','待发货','退款中','已退款']},
+          {k:'store',l:'门店',o:['全部门店','长沙岳麓中心店','长沙谷山店','深圳南山旗舰店']}],
+ sk:['id','member'],
+ cols:[{k:'id',t:'订单号',ty:'main',sub:'created'},
+       {k:'member',t:'客户',ty:'person',sub:'memberLv'},
+       {k:'goods',t:'商品/套餐',ty:'text'},
+       {k:'store',t:'门店',ty:'text'},
+       {k:'amount',t:'订单金额',ty:'money',o:1},
+       {k:'voucher',t:'券包/优惠抵扣',ty:'money',o:1},
+       {k:'pay',t:'实付金额',ty:'money'},
+       {k:'status',t:'状态',ty:'pill'},
+       {k:'ops',t:'操作',ty:'ops'}],
+ ops:[{t:'详情',fn:'detail'},{t:'发货',fn:'custom:ship'},{t:'退款审核',fn:'custom:refund'}],
+ rows:[
+  {id:'LF2026091500186',created:'09-15 10:24 支付',member:'林小凡',memberLv:'黑金会员',goods:'20 次课程套餐（全项目通用）',store:'长沙岳麓中心店',amount:'¥10,000',voucher:'-¥2,200',pay:'¥7,800',status:'已完成'},
+  {id:'LF2026091500187',created:'09-15 11:02 支付',member:'周雨彤',memberLv:'金卡会员',goods:'10 次课程套餐（运动损伤康复）',store:'深圳南山旗舰店',amount:'¥5,000',voucher:'-¥1,020',pay:'¥3,980',status:'已完成'},
+  {id:'LF2026091500188',created:'09-15 12:18 支付',member:'陈一鸣',memberLv:'金卡会员',goods:'筋膜枪（专业级）',store:'长沙谷山店',amount:'¥699',voucher:'-¥200',pay:'¥499',status:'待发货'},
+  {id:'LF2026091500189',created:'09-15 13:40 支付',member:'王小明',memberLv:'银卡会员',goods:'3 次体验套餐（新客专享）',store:'长沙岳麓中心店',amount:'¥1,500',voucher:'-¥280',pay:'¥1,220',status:'已完成'},
+  {id:'LF2026091500190',created:'09-15 14:06 支付',member:'李佳',memberLv:'银卡会员',goods:'泡沫轴（筋膜放松轴）× 2',store:'广州天河店',amount:'¥256',voucher:'¥0',pay:'¥256',status:'待发货'},
+  {id:'LF2026091500191',created:'09-15 15:12 支付',member:'刘亦辰',memberLv:'普通会员',goods:'单次课程券',store:'武汉光谷店',amount:'¥500',voucher:'-¥60',pay:'¥440',status:'退款中'},
+  {id:'LF2026091500192',created:'09-14 19:30 支付',member:'赵婷婷',memberLv:'银卡会员',goods:'5 次课程套餐（颈肩腰腿痛调理）',store:'长沙岳麓中心店',amount:'¥2,500',voucher:'-¥480',pay:'¥2,020',status:'已完成'},
+  {id:'LF2026091500193',created:'09-13 16:44 支付',member:'杨阳',memberLv:'普通会员',goods:'肌效贴（肌内效贴布）× 3',store:'长沙梅溪湖店',amount:'¥204',voucher:'¥0',pay:'¥204',status:'已退款'}
+ ],
+ form:[{k:'member',l:'客户',t:'text',req:1},{k:'goods',l:'商品/套餐',t:'text'},
+       {k:'store',l:'门店',t:'select',o:['长沙岳麓中心店','长沙谷山店','武汉光谷店','深圳南山旗舰店','广州天河店']},
+       {k:'amount',l:'订单金额（元）',t:'text'},{k:'voucher',l:'券包/优惠抵扣（元）',t:'text'},
+       {k:'pay',l:'实付金额（元）',t:'text'},
+       {k:'status',l:'订单状态',t:'select',o:['已完成','待发货','退款中','已退款']},
+       {k:'remark',l:'订单备注',t:'textarea',full:1}]
+},
+
+/* ---------------- 卡项与核销 ---------------- */
+cards:{key:'id',addLb:'新增卡项',addForm:'card',
+ sub:'卡种配置、会员持卡与核销记录；卡项余额会计入门店在途负债，核销以小票记录留痕',
+ stats:[
+  {lb:'在售卡种',vl:'9',u:'种',sb:'次卡 6 · 期限卡 3',i:'card',c:'#7C3AED'},
+  {lb:'今日核销',vl:'142',u:'单',sb:'核销率 96.2%',i:'checkCircle',c:'#0F9E56'},
+  {lb:'卡项在途余额',vl:'¥486.2万',sb:'较上月 +3.4%',i:'money',c:'#F0532B',cls:'up'},
+  {lb:'即将到期卡项',vl:'86',u:'张',sb:'30 天内到期，需提醒续卡',i:'clock',c:'#2563EB',cls:'hl'}
+ ],
+ filters:[{k:'type',l:'卡种类型',o:['全部类型','次卡','期限卡','体验卡']},
+          {k:'status',l:'状态',o:['全部状态','使用中','已用尽','已过期']},
+          {k:'store',l:'门店',o:['全部门店','长沙岳麓中心店','长沙谷山店','深圳南山旗舰店']}],
+ sk:['member','id'],
+ cols:[{k:'member',t:'持卡会员',ty:'person',sub:'memberLv'},
+       {k:'cardType',t:'卡种',ty:'main',sub:'id'},
+       {k:'store',t:'购买门店',ty:'text'},
+       {k:'total',t:'总次数',ty:'num',unit:'次'},
+       {k:'left',t:'剩余次数',ty:'num',unit:'次'},
+       {k:'amount',t:'卡项金额',ty:'money'},
+       {k:'expire',t:'有效期至',ty:'text'},
+       {k:'status',t:'状态',ty:'pill'},
+       {k:'ops',t:'操作',ty:'ops'}],
+ ops:[{t:'核销记录',fn:'detail'},{t:'延期',fn:'custom:extend'},{t:'作废',fn:'toggle'}],
+ rows:[
+  {id:'CD202603001',member:'林小凡',memberLv:'黑金会员',cardType:'20 次卡（全项目通用）',store:'长沙岳麓中心店',total:20,left:12,amount:'¥10,000',expire:'2028-03-01',status:'使用中'},
+  {id:'CD202603002',member:'王小明',memberLv:'银卡会员',cardType:'5 次卡（术后康复）',store:'长沙岳麓中心店',total:5,left:4,amount:'¥3,490',expire:'2027-03-01',status:'使用中'},
+  {id:'CD202604003',member:'陈一鸣',memberLv:'金卡会员',cardType:'10 次卡（拉伸放松）',store:'长沙谷山店',total:10,left:7,amount:'¥3,980',expire:'2027-04-18',status:'使用中'},
+  {id:'CD202605004',member:'周雨彤',memberLv:'金卡会员',cardType:'15 次卡（运动损伤）',store:'深圳南山旗舰店',total:15,left:9,amount:'¥7,500',expire:'2027-05-20',status:'使用中'},
+  {id:'CD202606005',member:'刘亦辰',memberLv:'普通会员',cardType:'单次体验卡',store:'武汉光谷店',total:1,left:1,amount:'¥500',expire:'2026-09-30',status:'使用中'},
+  {id:'CD202506006',member:'李佳',memberLv:'银卡会员',cardType:'季卡（不限次）',store:'广州天河店',total:36,left:0,amount:'¥6,800',expire:'2026-08-31',status:'已用尽'},
+  {id:'CD202406007',member:'杨阳',memberLv:'普通会员',cardType:'3 次体验卡',store:'长沙梅溪湖店',total:3,left:2,amount:'¥1,500',expire:'2026-06-30',status:'已过期'}
+ ],
+ form:[{k:'cardType',l:'卡种名称',t:'text',req:1},{k:'type',l:'卡种类型',t:'select',o:['次卡','期限卡','体验卡']},
+       {k:'total',l:'总次数',t:'num'},{k:'amount',l:'卡项金额（元）',t:'text'},
+       {k:'expire',l:'有效期至',t:'date'},{k:'store',l:'适用门店',t:'text'},
+       {k:'status',l:'状态',t:'select',o:['使用中','已用尽','已过期']},
+       {k:'rule',l:'核销规则说明',t:'textarea',full:1}]
+},
+
+/* ---------------- 优惠券管理 ---------------- */
+coupons:{key:'id',addLb:'新建优惠券',addForm:'coupon',
+ sub:'优惠券模板、发放与核销明细；用户端「我的优惠券」展示的券均由此处配置生成',
+ stats:[
+  {lb:'进行中的券',vl:'8',u:'张',sb:'新客券 / 满减券 / 生日券 / 券包券',i:'ticket',c:'#7C3AED'},
+  {lb:'本月已发放',vl:'12,860',u:'张',sb:'自动发放 8,420 · 手动 4,440',i:'gift',c:'#2563EB'},
+  {lb:'本月已核销',vl:'4,286',u:'张',sb:'核销率 33.3%',i:'checkCircle',c:'#0F9E56'},
+  {lb:'优惠让利金额',vl:'¥86.4万',sb:'占 GMV 30.2%',i:'money',c:'#F0532B',cls:'up'}
+ ],
+ filters:[{k:'type',l:'券类型',o:['全部类型','新客券','满减券','生日券','券包券','推荐券']},
+          {k:'status',l:'状态',o:['全部状态','进行中','已结束','已停用']}],
+ sk:['name'],
+ cols:[{k:'name',t:'优惠券名称',ty:'main',sub:'id'},
+       {k:'type',t:'券类型',ty:'pill'},
+       {k:'value',t:'面额/折扣',ty:'money',o:1},
+       {k:'cond',t:'使用门槛',ty:'text'},
+       {k:'valid',t:'有效期规则',ty:'text'},
+       {k:'sent',t:'已发放',ty:'num',unit:'张'},
+       {k:'used',t:'已核销',ty:'num',unit:'张'},
+       {k:'status',t:'状态',ty:'pill'},
+       {k:'ops',t:'操作',ty:'ops'}],
+ ops:[{t:'编辑',fn:'edit'},{t:'发放记录',fn:'detail'},{t:'停用',fn:'toggle'}],
+ rows:[
+  {id:'CP01',name:'新客首单立减券',type:'新客券',value:'¥100',cond:'满 ¥300 可用 · 仅限首次下单',valid:'领取后 30 天内有效',sent:'3,240',used:'1,186',status:'进行中'},
+  {id:'CP02',name:'满 2000 减 300',type:'满减券',value:'¥300',cond:'满 ¥2,000 可用',valid:'2026-09-01 至 2026-09-30',sent:'2,860',used:'842',status:'进行中'},
+  {id:'CP03',name:'生日专属礼券',type:'生日券',value:'¥200',cond:'无门槛 · 生日当月可用',valid:'生日当月内有效',sent:'1,120',used:'486',status:'进行中'},
+  {id:'CP04',name:'每月券包（平台赠送）',type:'券包券',value:'¥200',cond:'无门槛 · 购买课程套餐结算时自动抵扣',valid:'当月有效 · 每月自动赠送',sent:'4,180',used:'1,562',status:'进行中'},
+  {id:'CP05',name:'邀请好友推荐券',type:'推荐券',value:'¥150',cond:'满 ¥1,000 可用',valid:'领取后 60 天内有效',sent:'860',used:'162',status:'进行中'},
+  {id:'CP06',name:'中秋专项满减券',type:'满减券',value:'¥500',cond:'满 ¥5,000 可用',valid:'2026-09-20 至 2026-10-08',sent:'600',used:'48',status:'进行中'},
+  {id:'CP07',name:'夏季体验券（已结束）',type:'满减券',value:'¥120',cond:'满 ¥500 可用',valid:'2026-06-01 至 2026-08-31',sent:'2,400',used:'918',status:'已结束'}
+ ],
+ form:[{k:'name',l:'优惠券名称',t:'text',req:1},{k:'type',l:'券类型',t:'select',o:['新客券','满减券','生日券','券包券','推荐券']},
+       {k:'value',l:'面额（元）',t:'text'},{k:'cond',l:'使用门槛',t:'text'},
+       {k:'valid',l:'有效期规则',t:'text'},{k:'sendMode',l:'发放方式',t:'select',o:['自动发放','用户领取','手动发放']},
+       {k:'status',l:'状态',t:'select',o:['进行中','已结束','已停用']},
+       {k:'desc',l:'使用说明',t:'textarea',full:1}]
+},
+
+/* ---------------- 分销推广员 ---------------- */
+distributors:{key:'id',addLb:'新增推广员',addForm:'dist',
+ sub:'由后台设定的分销推广员；好友通过其专属链接下单即产生佣金，佣金提现由平台线下统一打款',
+ stats:[
+  {lb:'推广员总数',vl:'186',u:'人',sb:'本月新增 24 人',i:'share',c:'#7C3AED'},
+  {lb:'本月新增团队客户',vl:'428',u:'人',sb:'带来订单 682 单',i:'userHeart',c:'#2563EB'},
+  {lb:'本月佣金总额',vl:'¥12.86万',sb:'已结算 ¥9.4万',i:'money',c:'#F0532B',cls:'up'},
+  {lb:'佣金比例区间',vl:'8% ~ 15%',u:'',sb:'按推广员等级设定',i:'grid',c:'#0F9E56'}
+ ],
+ filters:[{k:'level',l:'推广员等级',o:['全部等级','普通推广员','金牌推广员','城市合伙人']},
+          {k:'status',l:'状态',o:['全部状态','正常','待审核','已停用']}],
+ sk:['name','phone'],
+ cols:[{k:'name',t:'推广员',ty:'person',sub:'phone'},
+       {k:'level',t:'等级',ty:'pill'},
+       {k:'rate',t:'佣金比例',ty:'main2',sub:'rateNote'},
+       {k:'team',t:'团队人数',ty:'num',unit:'人'},
+       {k:'orders',t:'本月订单',ty:'num',unit:'单'},
+       {k:'commission',t:'本月佣金',ty:'money',o:1},
+       {k:'balance',t:'可提现余额',ty:'money'},
+       {k:'status',t:'状态',ty:'pill'},
+       {k:'ops',t:'操作',ty:'ops'}],
+ ops:[{t:'编辑',fn:'edit'},{t:'团队明细',fn:'detail'},{t:'停用',fn:'toggle'}],
+ rows:[
+  {id:'DS001',name:'何静',phone:'138****3001',level:'城市合伙人',rate:'15%',rateNote:'额外团队分成 3%',team:86,orders:126,commission:'¥4,286',balance:'¥2,140',status:'正常'},
+  {id:'DS002',name:'罗琴',phone:'139****3002',level:'金牌推广员',rate:'12%',rateNote:'满 100 单升至合伙人',team:42,orders:88,commission:'¥2,860',balance:'¥1,680',status:'正常'},
+  {id:'DS003',name:'吴敏',phone:'137****3003',level:'金牌推广员',rate:'12%',rateNote:'',team:18,orders:64,commission:'¥2,120',balance:'¥960',status:'正常'},
+  {id:'DS004',name:'蒋帆',phone:'136****3004',level:'普通推广员',rate:'8%',rateNote:'',team:6,orders:32,commission:'¥860',balance:'¥420',status:'正常'},
+  {id:'DS005',name:'彭浩',phone:'135****3005',level:'普通推广员',rate:'8%',rateNote:'',team:0,orders:0,commission:'¥0',balance:'¥0',status:'待审核'},
+  {id:'DS006',name:'宋佳',phone:'133****3006',level:'普通推广员',rate:'8%',rateNote:'',team:2,orders:12,commission:'¥320',balance:'¥0',status:'已停用'}
+ ],
+ form:[{k:'name',l:'姓名',t:'text',req:1},{k:'phone',l:'手机号',t:'text',req:1},
+       {k:'level',l:'推广员等级',t:'select',o:['普通推广员','金牌推广员','城市合伙人']},
+       {k:'rate',l:'佣金比例',t:'text'},{k:'rateNote',l:'额外分成说明',t:'text'},
+       {k:'status',l:'状态',t:'select',o:['正常','待审核','已停用']},
+       {k:'note',l:'备注',t:'textarea',full:1}]
+},
+
+/* ---------------- 提现审核 ---------------- */
+withdrawals:{key:'id',addLb:'代提现',addForm:'wd',
+ sub:'推广员佣金提现申请；平台线下统一打款后在此标记打款完成并回传凭证',
+ stats:[
+  {lb:'待审核提现',vl:'5',u:'笔',sb:'合计 ¥8,640',i:'wallet',c:'#7C3AED',cls:'hl'},
+  {lb:'待打款',vl:'3',u:'笔',sb:'审核已通过 · 待线下打款',i:'money',c:'#2563EB'},
+  {lb:'本月已打款',vl:'¥9.4万',u:'',sb:'共 68 笔',i:'checkCircle',c:'#0F9E56'},
+  {lb:'平均处理时长',vl:'1.6',u:'天',sb:'较上月 -0.4 天',i:'clock',c:'#F0532B'}
+ ],
+ filters:[{k:'status',l:'状态',o:['全部状态','待审核','待打款','已打款','已驳回']},
+          {k:'type',l:'提现方式',o:['全部方式','微信零钱','银行转账']}],
+ sk:['name','id'],
+ cols:[{k:'id',t:'提现单号',ty:'main',sub:'apply'},
+       {k:'name',t:'推广员',ty:'person',sub:'level'},
+       {k:'amount',t:'提现金额',ty:'money',o:1},
+       {k:'fee',t:'手续费',ty:'money'},
+       {k:'real',t:'实付金额',ty:'money'},
+       {k:'type',t:'提现方式',ty:'text'},
+       {k:'account',t:'收款账户',ty:'text'},
+       {k:'status',t:'状态',ty:'pill'},
+       {k:'ops',t:'操作',ty:'ops'}],
+ ops:[{t:'通过',fn:'custom:approve'},{t:'驳回',fn:'custom:reject'},{t:'标记已打款',fn:'custom:paid'}],
+ rows:[
+  {id:'WD20260915001',apply:'09-15 09:20 申请',name:'何静',level:'城市合伙人',amount:'¥2,140',fee:'¥0',real:'¥2,140',type:'银行转账',account:'招商银行 ****6621',status:'待审核'},
+  {id:'WD20260915002',apply:'09-15 10:05 申请',name:'罗琴',level:'金牌推广员',amount:'¥1,680',fee:'¥0',real:'¥1,680',type:'微信零钱',account:'微信 ****3002',status:'待审核'},
+  {id:'WD20260915003',apply:'09-15 11:32 申请',name:'吴敏',level:'金牌推广员',amount:'¥960',fee:'¥0',real:'¥960',type:'微信零钱',account:'微信 ****3003',status:'待审核'},
+  {id:'WD20260914004',apply:'09-14 16:40 申请',name:'蒋帆',level:'普通推广员',amount:'¥420',fee:'¥0',real:'¥420',type:'微信零钱',account:'微信 ****3004',status:'待打款'},
+  {id:'WD20260913005',apply:'09-13 14:10 申请',name:'宋佳',level:'普通推广员',amount:'¥0',fee:'¥0',real:'¥0',type:'银行转账',account:'工商银行 ****7788',status:'已驳回'},
+  {id:'WD20260912006',apply:'09-12 09:50 申请',name:'何静',level:'城市合伙人',amount:'¥1,240',fee:'¥0',real:'¥1,240',type:'银行转账',account:'招商银行 ****6621',status:'已打款'}
+ ],
+ form:[{k:'name',l:'推广员',t:'text',req:1},{k:'amount',l:'提现金额（元）',t:'text'},
+       {k:'type',l:'提现方式',t:'select',o:['微信零钱','银行转账']},
+       {k:'account',l:'收款账户',t:'text'},
+       {k:'status',l:'状态',t:'select',o:['待审核','待打款','已打款','已驳回']},
+       {k:'remark',l:'审核备注',t:'textarea',full:1}]
+},
+
+/* ---------------- 营销活动 ---------------- */
+campaigns:{key:'id',addLb:'新建活动',addForm:'camp',
+ sub:'商城满减、拼团、邀请有礼、生日福利等活动配置；活动期间的价格与优惠由系统自动叠加校验',
+ stats:[
+  {lb:'进行中活动',vl:'5',u:'个',sb:'中秋专场、邀请有礼等',i:'megaphone',c:'#7C3AED'},
+  {lb:'本月活动参与',vl:'8,462',u:'人次',sb:'参与率 44%',i:'users',c:'#2563EB'},
+  {lb:'活动带来 GMV',vl:'¥96.8万',sb:'占总 GMV 33.8%',i:'money',c:'#F0532B',cls:'up'},
+  {lb:'活动投入产出比',vl:'1 : 5.6',u:'',sb:'投入 ¥17.2万 → 产出 ¥96.8万',i:'grid',c:'#0F9E56'}
+ ],
+ filters:[{k:'type',l:'活动类型',o:['全部类型','满减','拼团','邀请有礼','生日福利']},
+          {k:'status',l:'状态',o:['全部状态','进行中','已结束','草稿']}],
+ sk:['name'],
+ cols:[{k:'name',t:'活动名称',ty:'main',sub:'id'},
+       {k:'type',t:'活动类型',ty:'pill'},
+       {k:'time',t:'活动时间',ty:'main2',sub:'timeNote'},
+       {k:'scope',t:'适用门店',ty:'text'},
+       {k:'join',t:'参与人次',ty:'num',unit:'人次'},
+       {k:'gmv',t:'带动 GMV',ty:'money',o:1},
+       {k:'status',t:'状态',ty:'pill'},
+       {k:'ops',t:'操作',ty:'ops'}],
+ ops:[{t:'编辑',fn:'edit'},{t:'数据',fn:'detail'},{t:'结束',fn:'toggle'}],
+ rows:[
+  {id:'CAM01',name:'中秋专场 · 满 5000 减 500',type:'满减',time:'09-20 至 10-08',timeNote:'预热中',scope:'全部门店',join:'1,286',gmv:'¥18.6万',status:'进行中'},
+  {id:'CAM02',name:'邀请有礼 · 好友首单双方得券',type:'邀请有礼',time:'09-01 至 09-30',timeNote:'长期活动',scope:'全部门店',join:'3,420',gmv:'¥12.4万',status:'进行中'},
+  {id:'CAM03',name:'生日福利 · 生日当月赠券',type:'生日福利',time:'长期有效',timeNote:'系统自动发放',scope:'全部门店',join:'1,120',gmv:'¥8.2万',status:'进行中'},
+  {id:'CAM04',name:'新客拼团 · 3 人成团立减 400',type:'拼团',time:'09-10 至 09-30',timeNote:'进行中',scope:'6 家门店',join:'624',gmv:'¥22.8万',status:'进行中'},
+  {id:'CAM05',name:'脑科学训练体验专场',type:'满减',time:'09-15 至 09-25',timeNote:'进行中',scope:'4 家旗舰门店',join:'286',gmv:'¥6.4万',status:'进行中'},
+  {id:'CAM06',name:'暑期青少年体态矫正活动',type:'拼团',time:'07-01 至 08-31',timeNote:'已结束',scope:'3 家门店',join:'862',gmv:'¥28.4万',status:'已结束'},
+  {id:'CAM07',name:'双十一全店大促（策划中）',type:'满减',time:'11-01 至 11-11',timeNote:'待上线',scope:'全部门店',join:'0',gmv:'¥0',status:'草稿'}
+ ],
+ form:[{k:'name',l:'活动名称',t:'text',req:1},{k:'type',l:'活动类型',t:'select',o:['满减','拼团','邀请有礼','生日福利']},
+       {k:'time',l:'活动时间',t:'text'},{k:'scope',l:'适用门店',t:'text'},
+       {k:'rule',l:'优惠规则',t:'text'},{k:'budget',l:'活动预算（元）',t:'text'},
+       {k:'status',l:'状态',t:'select',o:['进行中','已结束','草稿']},
+       {k:'desc',l:'活动说明（小程序端展示）',t:'textarea',full:1}]
+},
+
+/* ---------------- 评价管理 ---------------- */
+reviews:{key:'id',addLb:'',addForm:'',
+ sub:'用户端服务完成后提交的评价；可回复、隐藏与置顶，评价数据同步至康复师评分与门店互评结果',
+ stats:[
+  {lb:'待处理评价',vl:'27',u:'条',sb:'含 3 条低分需重点跟进',i:'star',c:'#F0532B',cls:'hl'},
+  {lb:'本月评价数',vl:'1,147',u:'条',sb:'环比 +8.2%',i:'doc',c:'#2563EB'},
+  {lb:'平均服务评分',vl:'4.86',u:'分',sb:'满分 5 分',i:'star',c:'#7C3AED'},
+  {lb:'好评率',vl:'96.4%',u:'',sb:'差评 41 条已回复 38 条',i:'checkCircle',c:'#0F9E56'}
+ ],
+ filters:[{k:'store',l:'门店',o:['全部门店','长沙岳麓中心店','长沙谷山店','深圳南山旗舰店','武汉光谷店']},
+          {k:'stars',l:'评分',o:['全部评分','5 星','4 星','3 星及以下']},
+          {k:'status',l:'状态',o:['全部状态','待回访','已回复','已隐藏']}],
+ sk:['member','content','therapist'],
+ cols:[{k:'member',t:'评价人',ty:'person',sub:'time'},
+       {k:'therapist',t:'服务康复师',ty:'text'},
+       {k:'store',t:'门店',ty:'text'},
+       {k:'stars',t:'评分',ty:'stars'},
+       {k:'content',t:'评价内容',ty:'main'},
+       {k:'status',t:'状态',ty:'pill'},
+       {k:'ops',t:'操作',ty:'ops'}],
+ ops:[{t:'回复',fn:'custom:reply'},{t:'置顶',fn:'custom:top'},{t:'隐藏',fn:'toggle'}],
+ rows:[
+  {id:'RV001',member:'林小凡',time:'09-15 11:20',therapist:'王兴权',store:'长沙岳麓中心店',stars:5,content:'王老师很专业，脚踝扭伤调理三次就明显好转，动作讲解也很细致。',status:'待回访'},
+  {id:'RV002',member:'周雨彤',time:'09-15 17:40',therapist:'唐琪',store:'深圳南山旗舰店',stars:5,content:'环境很好，唐老师手法很到位，脑科学训练第一次体验就很有收获。',status:'已回复'},
+  {id:'RV003',member:'王小明',time:'09-14 15:30',therapist:'李娜',store:'长沙岳麓中心店',stars:5,content:'术后康复方案很清晰，李老师每次都记录进展，很安心。',status:'已回复'},
+  {id:'RV004',member:'李佳',time:'09-14 10:12',therapist:'周倩',store:'广州天河店',stars:3,content:'预约时间等待略久，实际开始比预约晚了 15 分钟，服务本身还可以。',status:'待回访'},
+  {id:'RV005',member:'刘亦辰',time:'09-13 19:05',therapist:'韩刚',store:'武汉光谷店',stars:4,content:'拉伸放松很舒服，希望下次能多留 5 分钟做放松指导。',status:'已回复'},
+  {id:'RV006',member:'杨阳',time:'09-12 09:48',therapist:'冯娟',store:'长沙梅溪湖店',stars:2,content:'体态评估报告内容偏简略，希望增加日常训练建议。',status:'待回访'},
+  {id:'RV007',member:'陈一鸣',time:'09-11 20:30',therapist:'刘洋',store:'长沙谷山店',stars:5,content:'刘洋老师非常专业，脑科学训练对孩子注意力改善明显。',status:'已回复'}
+ ],
+ form:[]
+},
+
+/* ---------------- 投诉工单 ---------------- */
+complaints:{key:'id',addLb:'新建工单',addForm:'complain',
+ sub:'来自用户端「意见反馈 / 投诉」与门店上报的工单；按类型流转至店长、区域与总部处理',
+ stats:[
+  {lb:'待处理工单',vl:'6',u:'单',sb:'其中超时 1 单需升级',i:'alert',c:'#EF4444',cls:'up'},
+  {lb:'处理中',vl:'4',u:'单',sb:'平均处理时长 1.2 天',i:'clock',c:'#2563EB'},
+  {lb:'本月已处理',vl:'86',u:'单',sb:'满意度 92%',i:'checkCircle',c:'#0F9E56'},
+  {lb:'主要投诉类型',vl:'服务态度',u:'',sb:'占比 38% · 其次为等待时长',i:'doc',c:'#7C3AED'}
+ ],
+ filters:[{k:'type',l:'投诉类型',o:['全部类型','服务态度','等待时长','效果异议','收费争议','环境卫生','其他']},
+          {k:'status',l:'状态',o:['全部状态','待处理','处理中','已处理','已关闭']},
+          {k:'store',l:'门店',o:['全部门店','长沙岳麓中心店','长沙谷山店','深圳南山旗舰店']}],
+ sk:['member','id','content'],
+ cols:[{k:'id',t:'工单号',ty:'main',sub:'time'},
+       {k:'member',t:'投诉人',ty:'person',sub:'phone'},
+       {k:'type',t:'投诉类型',ty:'pill'},
+       {k:'store',t:'涉及门店',ty:'text'},
+       {k:'target',t:'涉及人员',ty:'text'},
+       {k:'content',t:'投诉内容',ty:'main'},
+       {k:'status',t:'状态',ty:'pill'},
+       {k:'ops',t:'操作',ty:'ops'}],
+ ops:[{t:'处理',fn:'custom:handle'},{t:'详情',fn:'detail'},{t:'关闭',fn:'custom:close'}],
+ rows:[
+  {id:'TK20260915001',time:'09-15 08:30 提交',member:'李佳',phone:'133****2006',type:'等待时长',store:'广州天河店',target:'前台 刘婷',content:'预约 09:30，实际 09:45 才开始，等待时间过长，希望改善排期。',status:'待处理'},
+  {id:'TK20260915002',time:'09-15 10:12 提交',member:'杨阳',phone:'131****2008',type:'效果异议',store:'长沙梅溪湖店',target:'康复师 冯娟',content:'做了 3 次体态矫正，感觉没有明显变化，希望了解后续方案。',status:'处理中'},
+  {id:'TK20260914003',time:'09-14 16:40 提交',member:'刘亦辰',phone:'135****2005',type:'服务态度',store:'武汉光谷店',target:'康复师 韩刚',content:'沟通时语气较急，希望能耐心说明康复进度。',status:'已处理'},
+  {id:'TK20260914004',time:'09-14 11:05 提交',member:'黄思远',phone:'132****2007',type:'收费争议',store:'成都天府三街店',target:'门店',content:'套餐价格与小程序展示不一致，希望核实。',status:'处理中'},
+  {id:'TK20260913005',time:'09-13 20:20 提交',member:'周雨彤',phone:'136****2004',type:'环境卫生',store:'深圳南山旗舰店',target:'门店',content:'更衣区储物柜有异味，建议增加清洁频次。',status:'已处理'},
+  {id:'TK20260912006',time:'09-12 15:00 提交',member:'王小明',phone:'139****2002',type:'其他',store:'长沙岳麓中心店',target:'门店',content:'希望增加周末晚间的可预约时段。',status:'已关闭'}
+ ],
+ form:[{k:'member',l:'投诉人',t:'text',req:1},{k:'phone',l:'联系电话',t:'text'},
+       {k:'type',l:'投诉类型',t:'select',o:['服务态度','等待时长','效果异议','收费争议','环境卫生','其他']},
+       {k:'store',l:'涉及门店',t:'select',o:['长沙岳麓中心店','长沙谷山店','武汉光谷店','深圳南山旗舰店','广州天河店','成都天府三街店']},
+       {k:'target',l:'涉及人员',t:'text'},
+       {k:'status',l:'状态',t:'select',o:['待处理','处理中','已处理','已关闭']},
+       {k:'content',l:'投诉内容',t:'textarea',full:1},
+       {k:'handle',l:'处理结果（回复用户）',t:'textarea',full:1}]
+},
+
+/* ---------------- 内容与推广 ---------------- */
+content:{key:'id',addLb:'+ 新增推广内容',addForm:'content',
+ sub:'品牌推广内容由品牌专员录入、超管可见全部；内容同步至小程序端「健康资讯」板块',
+ stats:[
+  {lb:'推广内容数',vl:'38',u:'条',sb:'筛选结果',i:'star',c:'#7C3AED',cls:'hl'},
+  {lb:'总点赞数',vl:'19,269',u:'',sb:'累计互动',i:'heart',c:'#EF4444'},
+  {lb:'总评价数',vl:'1,147',u:'',sb:'评论数',i:'chat',c:'#2563EB'},
+  {lb:'总转发数',vl:'664',u:'',sb:'转发数',i:'share',c:'#F0532B'}
+ ],
+ filters:[{k:'publisher',l:'发布员工',o:['全部员工','冯娟','许露','唐琪','韩刚']},
+          {k:'plat',l:'发布平台',o:['全部平台','视频号','快手','抖音','B站','微博','小红书']},
+          {k:'time',l:'时间',o:['全部时间','近 7 天','近 30 天','本年度']}],
+ sk:['title','author'],
+ cols:[{k:'title',t:'标题 / 类型',ty:'main',sub:'typePlat'},
+       {k:'author',t:'发布人',ty:'person',sub:'authorRole'},
+       {k:'date',t:'发布时间',ty:'text'},
+       {k:'likes',t:'点赞',ty:'num'},
+       {k:'comments',t:'评价',ty:'num'},
+       {k:'shares',t:'转发',ty:'num'},
+       {k:'status',t:'状态',ty:'pill'},
+       {k:'link',t:'推广链接',ty:'link'},
+       {k:'ops',t:'操作',ty:'ops'}],
+ ops:[{t:'编辑',fn:'edit'},{t:'查看数据',fn:'detail'}],
+ rows:[
+  {id:'CT001',title:'青少年体态矫正，家长别再忽视了',type:'图文',plat:'快手',typePlat:'图文 · 快手',author:'冯娟',authorRole:'品牌专员',date:'2026-08-21',likes:827,comments:19,shares:18,status:'已发布'},
+  {id:'CT002',title:'运动损伤急性期，先冰敷还是先热敷？',type:'视频',plat:'视频号',typePlat:'视频 · 视频号',author:'许露',authorRole:'品牌专员',date:'2026-08-20',likes:329,comments:27,shares:13,status:'已发布'},
+  {id:'CT003',title:'深蹲膝盖内扣？可能是臀肌无力',type:'视频',plat:'快手',typePlat:'视频 · 快手',author:'冯娟',authorRole:'品牌专员',date:'2026-08-19',likes:660,comments:19,shares:18,status:'审核中'},
+  {id:'CT004',title:'体态评估：你有没有高低肩？',type:'视频',plat:'B站',typePlat:'视频 · B站',author:'韩刚',authorRole:'康复师',date:'2026-08-18',likes:810,comments:34,shares:18,status:'已发布'},
+  {id:'CT005',title:'跑步党注意：足底筋膜炎的预防与恢复',type:'图文',plat:'微博',typePlat:'图文 · 微博',author:'唐琪',authorRole:'康复师',date:'2026-08-16',likes:612,comments:30,shares:23,status:'审核中'},
+  {id:'CT006',title:'办公室久坐族必看：腰椎自救三部曲',type:'图文',plat:'抖音',typePlat:'图文 · 抖音',author:'唐琪',authorRole:'康复师',date:'2026-08-16',likes:333,comments:30,shares:5,status:'已发布'},
+  {id:'CT007',title:'测测后更容易疼？你可能忽略了三步热身',type:'视频',plat:'小红书',typePlat:'视频 · 小红书',author:'许露',authorRole:'品牌专员',date:'2026-08-14',likes:286,comments:22,shares:9,status:'已发布'}
+ ],
+ form:[{k:'title',l:'内容标题',t:'text',req:1},{k:'type',l:'内容类型',t:'select',o:['图文','视频']},
+       {k:'plat',l:'发布平台',t:'select',o:['视频号','快手','抖音','B站','微博','小红书']},
+       {k:'author',l:'发布人',t:'text'},{k:'date',l:'发布时间',t:'date'},
+       {k:'status',l:'状态',t:'select',o:['已发布','审核中','草稿']},
+       {k:'link',l:'推广链接',t:'text',full:1},
+       {k:'desc',l:'内容摘要',t:'textarea',full:1}]
+},
+
+/* ---------------- 消息与推送 ---------------- */
+notifications:{key:'id',addLb:'新建推送',addForm:'push',
+ sub:'小程序订阅消息、短信与服务通知模板；预约提醒、核销提醒、券包到账等在此配置',
+ stats:[
+  {lb:'本月推送总量',vl:'86,420',u:'条',sb:'到达率 98.2%',i:'bell',c:'#7C3AED'},
+  {lb:'开启中的模板',vl:'14',u:'个',sb:'订阅消息 11 · 短信 3',i:'doc',c:'#2563EB'},
+  {lb:'点击率',vl:'18.6%',u:'',sb:'较上月 +2.4%',i:'grid',c:'#0F9E56'},
+  {lb:'推送失败',vl:'1,562',u:'条',sb:'多为未订阅用户',i:'alert',c:'#F0532B',cls:'hl'}
+ ],
+ filters:[{k:'type',l:'消息类型',o:['全部类型','订阅消息','短信通知','站内消息']},
+          {k:'status',l:'状态',o:['全部状态','已推送','草稿','已关闭']}],
+ sk:['name'],
+ cols:[{k:'name',t:'推送名称',ty:'main',sub:'id'},
+       {k:'type',t:'消息类型',ty:'pill'},
+       {k:'scene',t:'触发场景',ty:'text'},
+       {k:'target',t:'目标人群',ty:'text'},
+       {k:'sent',t:'已推送',ty:'num',unit:'条'},
+       {k:'click',t:'点击率',ty:'main2',sub:'clickNote'},
+       {k:'status',t:'状态',ty:'pill'},
+       {k:'ops',t:'操作',ty:'ops'}],
+ ops:[{t:'编辑',fn:'edit'},{t:'推送记录',fn:'detail'},{t:'关闭',fn:'toggle'}],
+ rows:[
+  {id:'PS01',name:'预约成功提醒',type:'订阅消息',scene:'用户预约成功后即时发送',target:'全部预约用户',sent:'12,860',click:'24.2%',clickNote:'打开详情 3,112',status:'已推送'},
+  {id:'PS02',name:'到店前 2 小时提醒',type:'订阅消息',scene:'预约时间前 2 小时',target:'当日预约用户',sent:'18,420',click:'19.6%',clickNote:'改期率下降 0.8%',status:'已推送'},
+  {id:'PS03',name:'核销成功通知',type:'站内消息',scene:'门店核销完成后',target:'被核销用户',sent:'24,180',click:'12.4%',clickNote:'导向评价页',status:'已推送'},
+  {id:'PS04',name:'券包到账提醒',type:'订阅消息',scene:'每月 1 日自动赠送券包',target:'全部注册用户',sent:'19,268',click:'28.6%',clickNote:'券包使用率 46%',status:'已推送'},
+  {id:'PS05',name:'卡项即将到期提醒',type:'短信通知',scene:'卡项到期前 30 天 / 7 天',target:'持卡用户',sent:'1,240',click:'—',clickNote:'续卡 186 张',status:'已推送'},
+  {id:'PS06',name:'评价邀约',type:'订阅消息',scene:'服务完成后 2 小时',target:'完成服务用户',sent:'9,860',click:'31.2%',clickNote:'评价率 42%',status:'已推送'},
+  {id:'PS07',name:'双十一大促预热推送',type:'订阅消息',scene:'活动开始前 3 天',target:'活跃用户',sent:'0',click:'—',clickNote:'待上线',status:'草稿'}
+ ],
+ form:[{k:'name',l:'推送名称',t:'text',req:1},{k:'type',l:'消息类型',t:'select',o:['订阅消息','短信通知','站内消息']},
+       {k:'scene',l:'触发场景',t:'text'},{k:'target',l:'目标人群',t:'text'},
+       {k:'status',l:'状态',t:'select',o:['已推送','草稿','已关闭']},
+       {k:'content',l:'消息内容模板',t:'textarea',full:1}]
+},
+
+/* ---------------- 后台账号 ---------------- */
+accounts:{key:'id',addLb:'新增账号',addForm:'acc',
+ sub:'管理端登录账号；按角色分配菜单与数据权限，敏感操作二次校验',
+ stats:[
+  {lb:'后台账号',vl:'24',u:'个',sb:'启用 22 · 停用 2',i:'key',c:'#7C3AED'},
+  {lb:'今日登录',vl:'18',u:'次',sb:'异常登录 0 次',i:'userCheck',c:'#0F9E56'},
+  {lb:'高权限账号',vl:'3',u:'个',sb:'超级管理员 · 需定期复核',i:'shield',c:'#F0532B',cls:'hl'},
+  {lb:'近 30 天新增',vl:'2',u:'个',sb:'待完善角色 1 个',i:'plus',c:'#2563EB'}
+ ],
+ filters:[{k:'role',l:'角色',o:['全部角色','超级管理员','运营管理员','门店管理员','财务','品牌专员']},
+          {k:'status',l:'状态',o:['全部状态','正常','已停用']}],
+ sk:['name','account'],
+ cols:[{k:'name',t:'姓名 / 账号',ty:'main',sub:'account'},
+       {k:'role',t:'角色',ty:'pill'},
+       {k:'dept',t:'所属部门',ty:'text'},
+       {k:'scope',t:'数据范围',ty:'text'},
+       {k:'last',t:'最近登录',ty:'text'},
+       {k:'ip',t:'登录 IP',ty:'text'},
+       {k:'status',t:'状态',ty:'pill'},
+       {k:'ops',t:'操作',ty:'ops'}],
+ ops:[{t:'编辑',fn:'edit'},{t:'重置密码',fn:'custom:resetpwd'},{t:'停用',fn:'toggle'}],
+ rows:[
+  {id:'AC01',name:'王立群',account:'wangliqun · 集团总部',role:'超级管理员',dept:'集团总部',scope:'全部数据',last:'2026-09-15 09:20',ip:'113.***.24.86',status:'正常'},
+  {id:'AC02',name:'许露',account:'xulu · 品牌中心',role:'品牌专员',dept:'品牌中心',scope:'内容与推广',last:'2026-09-15 10:40',ip:'113.***.24.91',status:'正常'},
+  {id:'AC03',name:'周强',account:'zhouqiang · 长沙谷山店',role:'门店管理员',dept:'长沙谷山店',scope:'本店数据',last:'2026-09-15 08:58',ip:'220.***.18.12',status:'正常'},
+  {id:'AC04',name:'赵静',account:'zhaojing · 武汉光谷店',role:'门店管理员',dept:'武汉光谷店',scope:'本店数据',last:'2026-09-14 21:10',ip:'58.***.66.30',status:'正常'},
+  {id:'AC05',name:'刘敏',account:'liumin · 财务部',role:'财务',dept:'财务部',scope:'财务与结算',last:'2026-09-15 11:02',ip:'113.***.24.77',status:'正常'},
+  {id:'AC06',name:'陈曦',account:'chenxi · 运营中心',role:'运营管理员',dept:'运营中心',scope:'全部门店运营数据',last:'2026-09-13 17:26',ip:'183.***.52.18',status:'正常'},
+  {id:'AC07',name:'孙磊',account:'sunlei · 武汉汉街店',role:'门店管理员',dept:'武汉汉街店',scope:'本店数据',last:'2026-07-02 09:14',ip:'219.***.11.42',status:'已停用'}
+ ],
+ form:[{k:'name',l:'姓名',t:'text',req:1},{k:'account',l:'登录账号',t:'text',req:1},
+       {k:'role',l:'角色',t:'select',o:['超级管理员','运营管理员','门店管理员','财务','品牌专员']},
+       {k:'dept',l:'所属部门',t:'text'},{k:'scope',l:'数据范围',t:'select',o:['全部数据','本店数据','财务与结算','内容与推广']},
+       {k:'status',l:'状态',t:'select',o:['正常','已停用']},
+       {k:'note',l:'备注',t:'textarea',full:1}]
+},
+
+/* ---------------- 操作日志 ---------------- */
+logs:{key:'id',addLb:'',addForm:'',
+ sub:'所有管理端关键操作留痕，支持按账号、模块、时间检索，满足审计与追责需要',
+ stats:[
+  {lb:'今日操作记录',vl:'286',u:'条',sb:'涉及 18 个账号',i:'list',c:'#7C3AED'},
+  {lb:'敏感操作',vl:'12',u:'条',sb:'退款审核 5 · 券包配置 3 · 权限变更 4',i:'shield',c:'#F0532B',cls:'hl'},
+  {lb:'失败 / 拦截',vl:'2',u:'条',sb:'无权限访问 2 次',i:'alert',c:'#EF4444'},
+  {lb:'日志留存',vl:'180',u:'天',sb:'到期自动归档',i:'clock',c:'#2563EB'}
+ ],
+ filters:[{k:'mod',l:'模块',o:['全部模块','门店管理','员工管理','预约管理','订单管理','券包配置','评价管理','角色权限']},
+          {k:'status',l:'结果',o:['全部结果','成功','失败']}],
+ sk:['user','act','target'],
+ cols:[{k:'time',t:'操作时间',ty:'text'},
+       {k:'user',t:'操作人',ty:'person',sub:'userRole'},
+       {k:'mod',t:'模块',ty:'pill'},
+       {k:'act',t:'操作内容',ty:'main',sub:'target'},
+       {k:'ip',t:'IP 地址',ty:'text'},
+       {k:'status',t:'结果',ty:'pill'}],
+ ops:[],
+ rows:[
+  {id:'LG001',time:'2026-09-15 11:02:18',user:'王立群',userRole:'超级管理员',mod:'券包配置',act:'修改 20 次课程套餐券包立减金额 ¥2,200 → ¥2,300',target:'券包配置 · 课程套餐',ip:'113.***.24.86',status:'成功'},
+  {id:'LG002',time:'2026-09-15 10:48:02',user:'许露',userRole:'品牌专员',mod:'内容与推广',act:'新增推广内容「办公室久坐族必看：腰椎自救三部曲」',target:'内容 ID：CT006',ip:'113.***.24.91',status:'成功'},
+  {id:'LG003',time:'2026-09-15 10:20:44',user:'刘敏',userRole:'财务',mod:'订单管理',act:'审核通过退款申请 LF2026091500191 · ¥440',target:'订单 ID：LF2026091500191',ip:'113.***.24.77',status:'成功'},
+  {id:'LG004',time:'2026-09-15 09:58:10',user:'周强',userRole:'门店管理员',mod:'预约管理',act:'改期 AP20260915004 至 09-16 15:00（客户申请）',target:'预约 ID：AP20260915004',ip:'220.***.18.12',status:'成功'},
+  {id:'LG005',time:'2026-09-15 09:36:52',user:'陈曦',userRole:'运营管理员',mod:'评价管理',act:'回复评价 RV004 并提交店长跟进',target:'评价 ID：RV004',ip:'183.***.52.18',status:'成功'},
+  {id:'LG006',time:'2026-09-15 09:12:30',user:'赵静',userRole:'门店管理员',mod:'员工管理',act:'尝试修改武汉光谷店员工薪资配置',target:'员工 ID：E1009',ip:'58.***.66.30',status:'失败'},
+  {id:'LG007',time:'2026-09-14 21:10:08',user:'赵静',userRole:'门店管理员',mod:'排班管理',act:'调整 09-16 至 09-22 康复师排班',target:'武汉光谷店',ip:'58.***.66.30',status:'成功'}
+ ],
+ form:[]
+}
+};
+</script>
+<script>
+/* ============================================================
+   渲染引擎：菜单 / 表格 / 筛选 / 分页 / 表单 / 弹窗 / 抽屉
+   ============================================================ */
+ICON.heart='<path d="M12 20.2s-7.2-4.5-7.2-9.6A4.2 4.2 0 0112 8.1a4.2 4.2 0 017.2 2.5c0 5.1-7.2 9.6-7.2 9.6z"/>';
+ICON.chat='<path d="M21 12a8 8 0 01-11.6 7.1L4 21l1.9-5.4A8 8 0 1121 12z"/>';
+T.content.panelNote='（由品牌专员录入 · 超管可见全部）';
+T.content.exportStat='命中 <b>38</b> 条　总点赞 <b>19,269</b>　总评价 <b>1,147</b>　总转发 <b>664</b>';
+
+const PILL2={'康复师':'violet','前台':'blue','店长':'green','黑金':'violet','金卡':'amber','银卡':'gray','普通会员':'gray',
+'直营':'violet','合作':'blue','新客券':'violet','满减券':'blue','生日券':'red','券包券':'amber','推荐券':'green',
+'次卡':'blue','期限卡':'violet','体验卡':'amber','运动损伤':'violet','术后康复':'blue','慢性疼痛':'amber','脑科学训练':'green','放松塑形':'gray','评估筛查':'blue',
+'实物商品':'blue','课程套餐':'violet','用户端':'blue','前台代约':'amber','城市合伙人':'violet','金牌推广员':'amber','普通推广员':'gray',
+'微信零钱':'green','银行转账':'blue','满减':'blue','拼团':'violet','邀请有礼':'green','生日福利':'red',
+'订阅消息':'violet','短信通知':'blue','站内消息':'gray','超级管理员':'violet','运营管理员':'blue','门店管理员':'green','财务':'amber','品牌专员':'red',
+'服务态度':'red','等待时长':'amber','效果异议':'violet','收费争议':'blue','环境卫生':'green','其他':'gray'};
+
+const S={};
+let CUR='dashboard';
+function stv(id){if(!S[id])S[id]={q:'',f:{},page:1,sel:[],ps:8};return S[id];}
+function rowsOf(id){return T[id]?T[id].rows:[];}
+function colorOf(v){return PILL2[v]||PILL[v]||'gray';}
+function n2(v){return Number(String(v).replace(/[^\d.]/g,''))||0;}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function initials(n){return String(n||'—').slice(0,1);}
+function sphOf(c){
+  const n=(c.sk||[]).map(k=>{const col=(c.cols||[]).filter(x=>x.k===k)[0];return col?col.t.split(' / ')[0].trim():k;});
+  return n.length?n.join(' / '):'关键字';
+}
+
+/* ---------- toast ---------- */
+let toastTm=null;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('on');
+  clearTimeout(toastTm); toastTm=setTimeout(()=>el.classList.remove('on'),2400);
+}
+
+/* ---------- 侧边栏 ---------- */
+function renderSidebar(){
+  const box=document.getElementById('sbNav');
+  box.innerHTML=MENU.map(g=>'<div class="sb-group">'+g.g+'</div>'+g.items.map(id=>{
+    const m=MOD[id];
+    return '<div class="sb-item'+(id===CUR?' on':'')+'" data-m="'+id+'" onclick="go(\''+id+'\')">'+
+      svgIcon(m.i,16)+'<span class="lb">'+m.n+'</span>'+(m.b?'<span class="bg">'+m.b+'</span>':'')+'</div>';
+  }).join('')).join('');
+}
+
+/* ---------- 导航 ---------- */
+function go(id){
+  CUR=id;
+  if(!MOD[id].k||MOD[id].k!=='dash')T[id]&&stv(id);
+  renderSidebar();
+  renderCrumb();
+  const c=document.getElementById('content');
+  c.scrollTop=0;
+  c.innerHTML='<div class="page on" id="pg_'+id+'"></div>';
+  const k=MOD[id].k||'table';
+  if(k==='table'||k==='content')renderTable(id);
+  else if(k==='dash')renderDash(id);
+  else if(k==='org')renderOrg(id);
+  else if(k==='schedule')renderSchedule(id);
+  else if(k==='voucher')renderVoucher(id);
+  else if(k==='points')renderPoints(id);
+  else if(k==='eval')renderEvalTasks(id);
+  else if(k==='roles')renderRoles(id);
+  else if(k==='settings')renderSettings(id);
+}
+function renderCrumb(){
+  const m=MOD[CUR];
+  let g=''; MENU.forEach(x=>{if(x.items.indexOf(CUR)>=0)g=x.g;});
+  document.getElementById('crumb').innerHTML='<span class="b">了凡乐享</span><span class="s">/</span>'+
+    '<span class="s">'+g+'</span><span class="s">/</span><span class="c">'+m.n+'</span>';
+}
+function phHead(title,sub,acts){
+  return '<div class="ph"><div><h1>'+title+'</h1>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</div>'+
+    (acts?'<div class="acts">'+acts+'</div>':'')+'</div>';
+}
+function statCards(list){
+  return '<div class="stats">'+list.map(s=>'<div class="stat">'+
+    '<div class="lb">'+s.lb+'</div>'+
+    '<div class="vl num">'+s.vl+(s.u?'<small>'+s.u+'</small>':'')+'</div>'+
+    '<div class="sb '+(s.cls||'')+'">'+(s.sb||'')+'</div>'+
+    '<div class="ico">'+svgIcon(s.i,30,s.c,1.7)+'</div>'+
+  '</div>').join('')+'</div>';
+}
+
+/* ---------- 通用表格页 ---------- */
+function filtered(id){
+  const c=T[id],s=stv(id);
+  let rs=c.rows.slice();
+  if(s.q){
+    const q=s.q.toLowerCase();
+    rs=rs.filter(r=>(c.sk||[]).some(k=>String(r[k]||'').toLowerCase().indexOf(q)>=0));
+  }
+  Object.keys(s.f).forEach(k=>{
+    const v=s.f[k];
+    if(!v||v.indexOf('全部')===0||v==='全部')return;
+    rs=rs.filter(r=>matchF(k,v,r));
+  });
+  return rs;
+}
+function matchF(k,v,r){
+  if(k==='stars'){
+    const s=Number(r.stars)||0;
+    if(v.indexOf('5')===0)return s>=5; if(v.indexOf('4')===0)return s===4; return s<=3;
+  }
+  if(k==='date'){
+    const map={'今日':'09-15','明日':'09-16','本周':'09-'};
+    return map[v]?String(r.time||r.created||'').indexOf(map[v])>=0:true;
+  }
+  if(k==='time')return true;
+  const val=String(r[k]==null?'':r[k]);
+  return val===v||val.indexOf(v)>=0||v.indexOf(val)>=0;
+}
+function cell(r,col,i,mid){
+  const v=r[col.k];
+  switch(col.ty){
+    case 'main': return '<div class="c-main"><div class="t">'+esc(v)+(col.tag&&r[col.tag]?'<span class="tag" style="background:#F2EAFE;color:#7C3AED">'+esc(r[col.tag])+'</span>':'')+'</div>'+(col.sub&&r[col.sub]?'<div class="s">'+esc(r[col.sub])+'</div>':'')+'</div>';
+    case 'main2': return '<div><div style="font-size:12.5px;font-weight:700;color:var(--txt)">'+esc(v)+'</div>'+(col.sub&&r[col.sub]?'<div style="font-size:11.5px;color:var(--txt3);margin-top:3px">'+esc(r[col.sub])+'</div>':'')+'</div>';
+    case 'person': return '<div class="c-person"><div class="av">'+initials(v)+'</div><div><div class="nm">'+esc(v)+'</div>'+(col.sub&&r[col.sub]?'<div class="sub">'+esc(r[col.sub])+'</div>':'')+'</div></div>';
+    case 'num': return '<span class="num" style="font-weight:700;color:var(--txt)">'+esc(v)+(col.unit?' <span style="font-size:11px;color:var(--txt3);font-weight:600">'+col.unit+'</span>':'')+'</span>';
+    case 'money': return '<span class="money'+(col.o?' o':'')+'">'+esc(v)+'</span>';
+    case 'pill': return '<span class="pill '+colorOf(v)+'">'+esc(v)+'</span>';
+    case 'stars': return '<span style="color:#FFB020;font-size:12px;letter-spacing:1px">'+'★'.repeat(Number(v)||0)+'<span style="color:#E4E6EC">'+'★'.repeat(5-(Number(v)||0))+'</span></span>';
+    case 'link': return '<a class="lk" onclick="toast(\'已在新窗口打开推广链接（原型演示）\')">'+svgIcon('link',12,'currentColor',2.4)+'查看链接</a>';
+    case 'bar':{
+      const done=n2(r[col.k2]),tg=Number(r[col.k])||1,pct=Math.min(100,Math.round(done/tg*100));
+      return '<div><div style="font-size:11.5px;font-weight:700;color:var(--txt)">'+esc(r[col.k2]==null?'':r[col.k2])+' / '+esc(r[col.k])+'</div><div class="bar v"><i style="width:'+pct+'%"></i></div></div>';
+    }
+    case 'ops':{
+      const ops=T[mid].ops||[];
+      if(!ops.length)return '<span style="color:var(--txt3)">—</span>';
+      return '<div class="ops">'+ops.map(o=>{
+        const cls=o.fn==='detail'?'btn-ghost':'btn-ghost';
+        return '<button class="btn '+cls+' btn-sm" onclick="rowOp(\''+mid+'\','+i+',\''+o.fn+'\')">'+o.t+'</button>';
+      }).join('')+'</div>';
+    }
+    default: return esc(v);
+  }
+}
+function renderTable(id){
+  const c=T[id],s=stv(id),m=MOD[id];
+  let rs=filtered(id);
+  const total=rs.length,pages=Math.max(1,Math.ceil(total/s.ps));
+  if(s.page>pages)s.page=pages;
+  const view=rs.slice((s.page-1)*s.ps,s.page*s.ps);
+  const hasSel=s.sel.length>0;
+
+  let h=phHead(m.n,c.sub,
+    '<button class="btn btn-ghost" onclick="toast(\'已导出当前筛选结果（原型演示）\')">'+svgIcon('download',14)+'导出</button>'+
+    (c.addLb?'<button class="btn btn-primary" onclick="openForm(\''+id+'\')">'+svgIcon('plus',14)+c.addLb.replace(/^\+ /,'')+'</button>':''));
+  h+=statCards(c.stats);
+
+  h+='<div class="panel"><div class="pn-head"><div class="tt">'+m.n+'列表'+(c.panelNote?'<em>'+c.panelNote+'</em>':'')+'</div><div class="sp">';
+  h+='<input class="search-sm" placeholder="搜索'+sphOf(c)+'" value="'+esc(s.q)+'" oninput="setQ(\''+id+'\',this.value)">';
+  (c.filters||[]).forEach(f=>{
+    h+='<select class="sel" onchange="setF(\''+id+'\',\''+f.k+'\',this.value)">'+f.o.map(o=>'<option'+(s.f[f.k]===o?' selected':'')+'>'+o+'</option>').join('')+'</select>';
+  });
+  h+='</div></div>';
+  if(c.exportStat){
+    h+='<div class="hit">'+c.exportStat+'<span class="ck">筛选结果实时统计</span></div>';
+  }else{
+    h+='<div class="hit">命中 <b>'+total+'</b> 条'+(c.hitExtra||'')+'<span class="ck">'+(hasSel?'已选 '+s.sel.length+' 条':'')+'</span></div>';
+  }
+  if(hasSel){
+    h+='<div class="hit" style="background:#F7F4FE;color:#5B26A8">已选 '+s.sel.length+' 条　'+
+      '<button class="btn btn-ghost btn-sm" onclick="batchAct(\''+id+'\',\'导出\')">批量导出</button>'+
+      '<button class="btn btn-ghost btn-sm" onclick="batchAct(\''+id+'\',\'标记\')">批量标记</button>'+
+      '<button class="btn btn-danger btn-sm" onclick="batchAct(\''+id+'\',\'删除\')">批量删除</button>'+
+      '<span class="ck" style="color:#7C3AED;cursor:pointer" onclick="clearSel(\''+id+'\')">取消选择</span></div>';
+  }
+  h+='<div class="tw"><table class="tb"><thead><tr>'+
+     '<th style="width:40px"><input type="checkbox" class="cb" '+(hasSel&&s.sel.length===view.length?'checked':'')+' onchange="selAll(\''+id+'\',this.checked)"></th>'+
+     c.cols.map(col=>'<th>'+col.t+'</th>').join('')+'</tr></thead><tbody>';
+  if(!view.length){
+    h+='<tr><td colspan="'+(c.cols.length+1)+'"><div class="empty"><div class="em">🗂️</div>没有符合条件的数据，试试调整搜索或筛选条件</div></td></tr>';
+  }else{
+    h+=view.map(r=>{
+      const i=c.rows.indexOf(r);
+      const ck=s.sel.indexOf(r.id)>=0;
+      return '<tr><td><input type="checkbox" class="cb" '+(ck?'checked':'')+' onchange="selOne(\''+id+'\',\''+r.id+'\',this.checked)"></td>'+
+        c.cols.map(col=>'<td>'+cell(r,col,i,id)+'</td>').join('')+'</tr>';
+    }).join('');
+  }
+  h+='</tbody></table></div>';
+  h+='<div class="pager">共 '+total+' 条 · 每页 '+s.ps+' 条 · 第 '+s.page+' / '+pages+' 页<div class="sp">'+
+     '<button class="pg" '+(s.page<=1?'disabled':'')+' onclick="setPage(\''+id+'\','+(s.page-1)+')">上一页</button>';
+  for(let p=1;p<=pages;p++){
+    if(pages>7&&p>2&&p<pages-1&&Math.abs(p-s.page)>1){if(p===3)h+='<span style="color:var(--txt4)">…</span>';continue;}
+    h+='<button class="pg '+(p===s.page?'on':'')+'" onclick="setPage(\''+id+'\','+p+')">'+p+'</button>';
+  }
+  h+='<button class="pg" '+(s.page>=pages?'disabled':'')+' onclick="setPage(\''+id+'\','+(s.page+1)+')">下一页</button></div></div>';
+  h+='</div>';
+  document.getElementById('pg_'+id).innerHTML=h;
+}
+function setQ(id,v){stv(id).q=v;stv(id).page=1;renderTable(id);}
+function setF(id,k,v){stv(id).f[k]=v;stv(id).page=1;renderTable(id);}
+function setPage(id,p){stv(id).page=p;renderTable(id);const el=document.getElementById('content');el.scrollTop=Math.max(0,el.querySelector('.panel').offsetTop-10);}
+function selAll(id,on){const s=stv(id);s.sel=on?filtered(id).slice((s.page-1)*s.ps,s.page*s.ps).map(r=>r.id):[];renderTable(id);}
+function selOne(id,rid,on){const s=stv(id);const i=s.sel.indexOf(rid);if(on&&i<0)s.sel.push(rid);if(!on&&i>=0)s.sel.splice(i,1);renderTable(id);}
+function clearSel(id){stv(id).sel=[];renderTable(id);}
+function batchAct(id,act){
+  const s=stv(id);
+  if(act==='删除'){T[id].rows=T[id].rows.filter(r=>s.sel.indexOf(r.id)<0);}
+  s.sel=[];renderTable(id);toast('已'+act+'（原型演示）');
+}
+
+/* ---------- 行操作 ---------- */
+function rowOp(mid,idx,fn){
+  const r=T[mid].rows[idx];
+  if(fn==='edit')return openForm(mid,idx);
+  if(fn==='detail')return openDetail(mid,idx);
+  if(fn==='toggle')return toggleRow(mid,idx);
+  if(fn.indexOf('go:')===0){const t=fn.slice(3);go(t);toast('已跳转至「'+MOD[t].n+'」');return;}
+  if(fn.indexOf('custom:')===0)return customAct(mid,idx,fn.slice(7));
+}
+function toggleRow(mid,idx){
+  const r=T[mid].rows[idx],on=r.status==='停用'||r.status==='已停用';
+  const map={'营业中':'已停用','已停用':'营业中','在职':'离职','离职':'在职','正常':'已停用','已停用':'正常','使用中':'已过期',
+    '进行中':'已结束','已结束':'进行中','已推送':'已关闭','已关闭':'已推送','上架中':'已下架','已下架':'上架中','在售':'已下架',
+    '已发布':'已隐藏','已隐藏':'已发布','待回访':'已回复','已回复':'待回访','审核中':'已发布','已完成':'待核销'};
+  const nv=map[r.status]||(String(r.status).indexOf('已')===0?'正常':'已停用');
+  r.status=nv;renderTable(mid);toast('状态已更新为「'+nv+'」');
+}
+
+/* ---------- 自定义业务动作（弹窗式） ---------- */
+const ACT={
+ reschedule:{t:'预约改期',sub:'用户端支持提前 2 小时自助改期；后台改期不受时间限制，改期后系统自动通知客户与康复师',
+   f:[{k:'date',l:'改期后日期',t:'select',o:['2026-09-16','2026-09-17','2026-09-18','2026-09-19']},
+      {k:'time',l:'改期后时段',t:'select',o:['09:00 – 10:00','10:00 – 11:00','14:00 – 15:00','15:00 – 16:00','16:30 – 17:30','19:00 – 20:00']},
+      {k:'therapist',l:'康复师（可更换）',t:'select',o:['不更换','王兴权','李娜','刘洋','唐琪','韩刚']},
+      {k:'reason',l:'改期原因',t:'textarea',full:1}],
+   set:{status:'已改期'},msg:'改期成功，已通知客户与康复师'},
+ cancel:{t:'取消预约',sub:'取消后如需退款，将按卡项退款规则处理并生成退款工单',
+   f:[{k:'reason',l:'取消原因',t:'select',o:['客户主动取消','客户未到店','门店原因（设备/人员）','重复预约']},
+      {k:'remark',l:'备注',t:'textarea',full:1}],
+   set:{status:'已取消'},msg:'预约已取消，客户已收到通知'},
+ verify:{t:'核销确认',sub:'核销后将扣减会员卡项次数，并生成核销小票记录',
+   f:[{k:'code',l:'核销码',t:'text',ph:'请输入或扫码录入核销码'},
+      {k:'remark',l:'核销备注',t:'textarea',full:1}],
+   set:{status:'已完成'},msg:'核销成功，已扣减 1 次卡项并通知康复师'},
+ ship:{t:'订单发货',sub:'实物商品订单发货，可填写快递单号后同步给用户',
+   f:[{k:'company',l:'快递公司',t:'select',o:['顺丰速运','京东物流','中通快递','圆通速递']},
+      {k:'no',l:'快递单号',t:'text'},{k:'remark',l:'备注',t:'textarea',full:1}],
+   set:{status:'已完成'},msg:'已发货，运单信息已同步小程序'},
+ refund:{t:'退款审核',sub:'审核通过后按原支付渠道退回；课程套餐已核销部分按剩余次数折算',
+   f:[{k:'result',l:'审核结果',t:'select',o:['通过','驳回']},
+      {k:'amount',l:'退款金额（元）',t:'text'},{k:'remark',l:'审核意见',t:'textarea',full:1}],
+   set:{status:'已退款'},msg:'退款审核已完成'},
+ extend:{t:'卡项延期',sub:'为会员延长卡项有效期，延期记录将同步至用户端卡包',
+   f:[{k:'days',l:'延长天数',t:'select',o:['30 天','60 天','90 天','180 天']},
+      {k:'remark',l:'延期原因',t:'textarea',full:1}],
+   set:{status:'使用中'},msg:'卡项有效期已延长'},
+ points:{t:'调整积点',sub:'积点调整将实时同步用户端「我的积点」，并写入积点流水',
+   f:[{k:'type',l:'调整类型',t:'select',o:['增加积点','扣减积点']},
+      {k:'num',l:'调整数量',t:'num'},{k:'reason',l:'调整原因',t:'textarea',full:1}],
+   msg:'积点已调整，用户端已同步'},
+ approve:{t:'审核通过',sub:'审核通过后进入「待打款」，由财务线下打款后标记完成',
+   f:[{k:'remark',l:'审核意见',t:'textarea',full:1}],set:{status:'待打款'},msg:'已审核通过，待财务线下打款'},
+ reject:{t:'驳回申请',sub:'驳回后金额退回推广员可提现余额',
+   f:[{k:'reason',l:'驳回原因',t:'select',o:['收款信息有误','佣金存在异常','实名信息不符']},
+      {k:'remark',l:'补充说明',t:'textarea',full:1}],set:{status:'已驳回'},msg:'已驳回提现申请'},
+ paid:{t:'标记已打款',sub:'线下统一打款完成后回传凭证并标记，用户端可查看打款结果',
+   f:[{k:'date',l:'打款日期',t:'date'},{k:'voucher',l:'打款凭证号',t:'text'},
+      {k:'remark',l:'备注',t:'textarea',full:1}],set:{status:'已打款'},msg:'已标记打款完成'},
+ reply:{t:'回复评价',sub:'回复内容将展示在小程序端评价下方，低分评价建议同时发起回访',
+   f:[{k:'content',l:'回复内容',t:'textarea',full:1},
+      {k:'follow',l:'同步发起回访',t:'select',o:['是','否']}],
+   set:{status:'已回复'},msg:'评价回复已提交，用户端已展示'},
+ top:{t:'置顶评价',sub:'置顶后该评价将出现在服务详情页评价区首位',
+   f:[{k:'scope',l:'置顶范围',t:'select',o:['康复师主页','门店主页','服务详情页']}],
+   msg:'已置顶该评价'},
+ handle:{t:'处理投诉工单',sub:'填写处理结果后系统将同步回复用户，并记录处理时效',
+   f:[{k:'result',l:'处理结果',t:'select',o:['已致歉并补偿优惠券','已调整排期','已安排重新服务','已退款','已上报区域']},
+      {k:'amount',l:'补偿金额 / 券面额（元）',t:'text'},
+      {k:'remark',l:'处理说明（回复用户）',t:'textarea',full:1}],
+   set:{status:'已处理'},msg:'工单已处理，处理结果已回复用户'},
+ close:{t:'关闭工单',sub:'关闭后不再计入处理时效统计',
+   f:[{k:'remark',l:'关闭原因',t:'textarea',full:1}],set:{status:'已关闭'},msg:'工单已关闭'},
+ resetpwd:{t:'重置密码',sub:'重置后系统将生成随机密码并发送至账号绑定手机号',
+   f:[{k:'mode',l:'重置方式',t:'select',o:['发送短信随机密码','手动设置密码']},
+      {k:'pwd',l:'新密码（手动设置时填写）',t:'text'}],
+   msg:'密码已重置，通知短信已发送'}
+};
+function customAct(mid,idx,key){
+  const a=ACT[key];
+  if(!a){toast('操作已执行（原型演示）');return;}
+  const r=T[mid].rows[idx];
+  let h='<div class="md-head"><div style="flex:1"><h3>'+a.t+'</h3>'+(a.sub?'<div class="sub">'+a.sub+'</div>':'')+'</div>'+
+    '<button class="x" onclick="closeModal()">✕</button></div><div class="md-body">';
+  h+='<div class="hint-box orange">'+svgIcon('alert',15,'#B4431C',2)+'<div>当前记录：<em>'+esc(r.id||r.name||'')+'</em>　'+esc(r.member||r.name||r.cardType||'')+'</div></div>';
+  h+='<div class="form-grid">'+a.f.map(f=>formField(f)).join('')+'</div></div>';
+  h+='<div class="md-foot"><div class="lf">操作将记录到操作日志</div><button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
+     '<button class="btn btn-primary" onclick="doAction(\''+mid+'\','+idx+',\''+key+'\')">确认提交</button></div>';
+  openModalBox(h);
+}
+function doAction(mid,idx,key){
+  const a=ACT[key],r=T[mid].rows[idx];
+  if(a&&a.set)Object.keys(a.set).forEach(k=>r[k]=a.set[k]);
+  if(key==='points'){
+    const t=val('type'),nn=Number(val('num'))||0;
+    if(t==='增加积点')r.points=Number(r.points||0)+nn;else r.points=Math.max(0,Number(r.points||0)-nn);
+  }
+  if(key==='extend'){const d=val('days');if(d&&r.expire&&r.expire!=='—'){const dt=new Date(r.expire);dt.setDate(dt.getDate()+parseInt(d));r.expire=dt.toISOString().slice(0,10);}}
+  if(key==='refund'&&val('result')==='驳回')r.status='已完成';
+  closeModal();renderTable(mid);toast(a?a.msg:'操作已完成');
+}
+function val(k){const el=document.getElementById('ff_'+k);return el?el.value:'';}
+function elv(id){const el=document.getElementById(id);return el?el.value:'';}
+
+/* ---------- 表单 ---------- */
+function formField(f,rowv){
+  const v=rowv!=null&&rowv[f.k]!=null?rowv[f.k]:(f.dv!=null?f.dv:'');
+  let inner='';
+  if(f.t==='select'){
+    inner='<select id="ff_'+f.k+'">'+f.o.map(o=>'<option'+(String(v)===o?' selected':'')+'>'+o+'</option>').join('')+'</select>';
+  }else if(f.t==='textarea'){
+    inner='<textarea id="ff_'+f.k+'" placeholder="'+(f.ph||'请输入')+'">'+esc(v)+'</textarea>';
+  }else{
+    inner='<input id="ff_'+f.k+'" type="'+(f.t==='num'?'number':f.t==='date'?'date':'text')+'" value="'+esc(v)+'" placeholder="'+(f.ph||('请输入'+f.l))+'">';
+  }
+  return '<div class="fi'+(f.full?' full':'')+'"><label>'+f.l+(f.req?'<i>*</i>':'')+'</label>'+inner+'</div>';
+}
+function openForm(mid,idx){
+  const c=T[mid],m=MOD[mid],isEdit=idx!=null,row=isEdit?c.rows[idx]:{};
+  let h='<div class="md-head"><div style="flex:1"><h3>'+(isEdit?'编辑':'新增')+m.n.replace('管理','')+'</h3>'+
+    '<div class="sub">'+(isEdit?'记录 ID：'+esc(row.id||'')+'　修改后将同步至小程序端':'填写完成后将同步至小程序端各相关页面')+'</div></div>'+
+    '<button class="x" onclick="closeModal()">✕</button></div><div class="md-body">';
+  const f=c.form&&c.form.length?c.form:defaultForm(mid);
+  h+='<div class="form-grid">'+f.map(x=>formField(x,row)).join('')+'</div></div>';
+  h+='<div class="md-foot"><div class="lf">带 <i style="color:var(--red)">*</i> 为必填项</div><button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
+     '<button class="btn btn-primary" onclick="saveForm(\''+mid+'\','+(isEdit?idx:'null')+')">'+(isEdit?'保存修改':'确认新增')+'</button></div>';
+  openModalBox(h);
+}
+function defaultForm(mid){
+  const c=T[mid];
+  return c.cols.filter(x=>x.ty!=='ops').map(x=>({k:x.k,l:x.t,t:x.sub?'text':'text'})).concat([{k:'remark',l:'备注',t:'textarea',full:1}]);
+}
+function saveForm(mid,idx){
+  const c=T[mid],f=(c.form&&c.form.length?c.form:defaultForm(mid));
+  const data={};
+  f.forEach(x=>{data[x.k]=val(x.k);});
+  if(idx!=null){
+    Object.keys(data).forEach(k=>{c.rows[idx][k]=data[k];});
+    toast('已保存修改，数据已同步');
+  }else{
+    const base=(c.rows[0]&&c.rows[0].id)||'NEW';
+    const pfx=base.replace(/[0-9]+$/,'');
+    const row=Object.assign({id:pfx+(9000+c.rows.length),status:'正常',created:'刚刚'},data);
+    c.rows.unshift(row);
+    toast('新增成功，已同步至小程序端');
+  }
+  closeModal();
+  const el=document.getElementById('pg_'+mid);if(el)renderTable(mid);
+}
+
+/* ---------- 弹窗 / 抽屉 / 详情 ---------- */
+function openModalBox(html){document.getElementById('modal').innerHTML=html;document.getElementById('mask').classList.add('on');}
+function closeModal(){document.getElementById('mask').classList.remove('on');}
+function openDrawer(html){document.getElementById('drawer').innerHTML=html;
+  document.getElementById('dmask').classList.add('on');document.getElementById('drawer').classList.add('on');}
+function closeDrawer(){document.getElementById('dmask').classList.remove('on');document.getElementById('drawer').classList.remove('on');}
+function openDetail(mid,idx){
+  const c=T[mid],m=MOD[mid],r=c.rows[idx];
+  let h='<div class="dw-head"><div style="flex:1"><h3>'+esc(r.name||r.member||r.cardType||m.n)+'</h3>'+
+    '<div class="sub" style="font-size:11.5px;color:var(--txt3);margin-top:4px">记录 ID：'+esc(r.id||'—')+'</div></div>'+
+    '<button class="btn btn-ghost btn-sm" onclick="closeDrawer()">关闭</button></div><div class="dw-body">';
+  h+='<div class="sec-t">基本信息</div><div class="kv">';
+  c.cols.filter(x=>x.ty!=='ops'&&x.ty!=='link').forEach(x=>{
+    let v=r[x.k];
+    if(x.ty==='pill')v='<span class="pill '+colorOf(v)+'">'+esc(v)+'</span>';
+    else if(x.ty==='stars')v='<span style="color:#FFB020">'+'★'.repeat(Number(r[x.k])||0)+'</span>';
+    else if(x.ty==='bar')v=esc(r[x.k2]||'')+' / '+esc(r[x.k]||'');
+    else v=esc(v);
+    h+='<div class="k">'+x.t+'</div><div class="v">'+v+'</div>';
+    if(x.sub&&r[x.sub])h+='<div class="k">补充信息</div><div class="v" style="font-weight:500;color:var(--txt2)">'+esc(r[x.sub])+'</div>';
+  });
+  h+='</div>';
+  h+='<div class="sec-t">关联记录</div><div style="padding:0 20px 16px">';
+  h+='<div class="hint-box">'+svgIcon('link',15,'#5B26A8',2)+'<div>该记录已关联小程序端页面展示；任何修改都会写入操作日志并保留 180 天审计痕迹。</div></div>';
+  h+='<table class="tb" style="border:1px solid var(--line);border-radius:12px;overflow:hidden"><thead><tr><th>时间</th><th>动作</th><th>操作人</th></tr></thead><tbody>'+
+     '<tr><td>2026-09-15 10:24</td><td>创建记录</td><td>王立群</td></tr>'+
+     '<tr><td>2026-09-15 10:48</td><td>修改关键字段</td><td>王立群</td></tr>'+
+     '<tr><td>2026-09-15 11:02</td><td>审核通过</td><td>刘敏</td></tr></tbody></table></div>';
+  h+='</div><div class="dw-foot"><button class="btn btn-ghost" onclick="toast(\'已导出详情（原型演示）\')">导出</button>'+
+     '<button class="btn btn-primary" onclick="closeDrawer();openForm(\''+mid+'\','+idx+')">编辑</button></div>';
+  openDrawer(h);
+}
+
+/* ---------- 顶栏交互 ---------- */
+function globalSearchGo(){
+  const q=document.getElementById('globalSearch').value.trim();
+  if(!q){toast('请输入搜索关键词');return;}
+  const res=[];
+  Object.keys(T).forEach(id=>{
+    const c=T[id];
+    c.rows.forEach((r,i)=>{
+      const hay=(c.sk||[]).map(k=>String(r[k]||'')).join(' ')+' '+Object.values(r).join(' ');
+      if(hay.toLowerCase().indexOf(q.toLowerCase())>=0)res.push({id:id,i:i,txt:r.name||r.member||r.title||r.id||''});
+    });
+  });
+  let h='<div class="md-head"><div style="flex:1"><h3>全局搜索「'+esc(q)+'」</h3><div class="sub">共命中 '+res.length+' 条记录，点击可直接进入对应模块</div></div><button class="x" onclick="closeModal()">✕</button></div><div class="md-body">';
+  if(!res.length)h+='<div class="empty"><div class="em">🔍</div>没有找到匹配记录</div>';
+  else h+='<div style="display:flex;flex-direction:column;gap:8px">'+res.slice(0,20).map(x=>{
+    const c=T[x.id],r=c.rows[x.i];
+    return '<div class="todo-li" style="border:1px solid var(--line);border-radius:12px" onclick="closeModal();goFromSearch(\''+x.id+'\',\''+esc(q)+'\')">'+
+      '<div class="ic" style="background:#F2EAFE">'+svgIcon(MOD[x.id].i,16,'#7C3AED')+'</div>'+
+      '<div class="bd"><b>'+esc(r.name||r.member||r.title||r.cardType||r.id)+'</b><span>'+MOD[x.id].n+' · '+esc(r.id||'')+'</span></div><span class="arr">›</span></div>';
+  }).join('')+'</div>';
+  h+='</div>';
+  openModalBox(h);
+}
+function goFromSearch(id,q){go(id);stv(id).q=q;renderTable(id);}
+function openTodoDrawer(){
+  const todos=[
+    {t:'待处理评价',n:27,d:'含 3 条低分需重点跟进',id:'reviews',bg:'#FFF1E3',e:'⭐'},
+    {t:'待处理投诉工单',n:6,d:'超时 1 单需升级处理',id:'complaints',bg:'#FFE9EC',e:'📢'},
+    {t:'退款待审核',n:5,d:'涉及金额 ¥1.86 万',id:'orders',bg:'#EAF0FF',e:'💳'},
+    {t:'提现待审核',n:5,d:'合计 ¥8,640 待处理',id:'withdrawals',bg:'#F2EAFE',e:'💰'},
+    {t:'门店互评任务',n:3,d:'9 月任务进行中，参与率 68%',id:'evalTasks',bg:'#E9F9F1',e:'✅'},
+    {t:'库存预警商品',n:3,d:'库存低于 10 件需补货',id:'goods',bg:'#FFF5E6',e:'📦'},
+    {t:'待核销预约',n:8,d:'今日待核销 8 单',id:'appts',bg:'#EAF0FF',e:'📅'}
+  ];
+  let h='<div class="dw-head"><div style="flex:1"><h3>待办提醒</h3><div style="font-size:11.5px;color:var(--txt3);margin-top:4px">共 '+todos.reduce((a,b)=>a+b.n,0)+' 项待处理事项</div></div>'+
+    '<button class="btn btn-ghost btn-sm" onclick="closeDrawer()">关闭</button></div><div class="dw-body">';
+  h+=todos.map(x=>'<div class="todo-li" onclick="closeDrawer();go(\''+x.id+'\');toast(\'已进入「'+x.t+'」\')">'+
+    '<div class="ic" style="background:'+x.bg+'">'+x.e+'</div><div class="bd"><b>'+x.t+' · '+x.n+' 项</b><span>'+x.d+'</span></div><span class="arr">›</span></div>').join('');
+  h+='</div><div class="dw-foot"><button class="btn btn-ghost" onclick="closeDrawer();toast(\'已全部标记为已读\')">全部标记已读</button></div>';
+  openDrawer(h);
+}
+function openProfile(){
+  let h='<div class="md-head"><div style="flex:1"><h3>超级管理员</h3><div class="sub">王立群 · 集团总部 · 数据范围：全部数据</div></div>'+
+    '<button class="x" onclick="closeModal()">✕</button></div><div class="md-body">'+
+    '<div class="kv" style="padding:0"><div class="k">登录账号</div><div class="v">wangliqun · 集团总部</div>'+
+    '<div class="k">当前角色</div><div class="v"><span class="pill violet">超级管理员</span></div>'+
+    '<div class="k">数据范围</div><div class="v">全部门店 / 全部员工 / 全部会员</div>'+
+    '<div class="k">最近登录</div><div class="v">2026-09-15 09:20 · IP 113.***.24.86</div>'+
+    '<div class="k">已开启</div><div class="v">操作日志留痕 · 敏感操作二次校验</div></div>'+
+    '<div class="hint-box" style="margin-top:14px">'+svgIcon('shield',15,'#5B26A8',2)+'<div>超级管理员账号建议每季度复核权限；如需切换账号权限，请前往「角色权限」调整。</div></div></div>'+
+    '<div class="md-foot"><button class="btn btn-ghost" onclick="closeModal();go(\'accounts\')">账号管理</button>'+
+    '<button class="btn btn-primary" onclick="closeModal();toast(\'已退出登录（原型演示）\')">退出登录</button></div>';
+  openModalBox(h);
+}
+function syncMp(){toast('已提交小程序同步，门店/服务/券包配置将在 1 分钟内生效');}
+</script>
+<script>
+/* ============================================================
+   专属页面：数据看板 / 组织架构 / 排班 / 券包配置 / 积点成长值
+             门店互评任务 / 角色权限 / 系统设置
+   ============================================================ */
+
+/* ---------- 轻量图表（纯 SVG） ---------- */
+function lineChart(vals,labels,color,title,legend){
+  const W=620,H=200,pl=34,pr=14,pt=18,pb=26;
+  const max=Math.max.apply(null,vals)*1.18;
+  const sx=(W-pl-pr)/(vals.length-1);
+  const P=vals.map((v,i)=>[pl+i*sx,H-pb-(v/max)*(H-pt-pb)]);
+  const d=P.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const area=d+' L'+P[P.length-1][0].toFixed(1)+' '+(H-pb)+' L'+pl+' '+(H-pb)+' Z';
+  let g='';
+  for(let i=0;i<=4;i++){const y=pt+i*(H-pt-pb)/4;g+='<line x1="'+pl+'" y1="'+y+'" x2="'+(W-pr)+'" y2="'+y+'" stroke="#F1F2F6" stroke-width="1"/>'+
+    '<text x="'+(pl-8)+'" y="'+(y+4)+'" text-anchor="end" font-size="10" fill="#9A9AAC">'+Math.round(max*(4-i)/4/1000)+'k</text>';}
+  return '<div class="chart-box"><div class="tt">'+title+'<span class="lg"><s style="background:'+color+'"></s>'+(legend||'')+'</span></div>'+
+   '<svg viewBox="0 0 '+W+' '+H+'"><defs><linearGradient id="g_'+color.replace('#','')+'" x1="0" y1="0" x2="0" y2="1">'+
+   '<stop offset="0" stop-color="'+color+'" stop-opacity=".28"/><stop offset="1" stop-color="'+color+'" stop-opacity="0"/></linearGradient></defs>'+
+   g+'<path d="'+area+'" fill="url(#g_'+color.replace('#','')+')"/>'+
+   '<path d="'+d+'" fill="none" stroke="'+color+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>'+
+   P.map((p,i)=>'<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="3.4" fill="#fff" stroke="'+color+'" stroke-width="2"/>'+
+     '<text x="'+p[0].toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="10" fill="#9A9AAC">'+labels[i]+'</text>').join('')+
+   '</svg></div>';
+}
+function barChart(vals,labels,color,title,legend){
+  const W=620,H=200,pl=34,pr=14,pt=18,pb=26;
+  const max=Math.max.apply(null,vals)*1.2;
+  const bw=(W-pl-pr)/vals.length*0.52;
+  let g='';
+  for(let i=0;i<=4;i++){const y=pt+i*(H-pt-pb)/4;g+='<line x1="'+pl+'" y1="'+y+'" x2="'+(W-pr)+'" y2="'+y+'" stroke="#F1F2F6"/>';}
+  const bars=vals.map((v,i)=>{
+    const x=pl+(i+0.5)*(W-pl-pr)/vals.length-bw/2;
+    const h=(v/max)*(H-pt-pb), y=H-pb-h;
+    return '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+'" rx="5" fill="'+color+'" opacity="'+(0.55+0.45*(v/max)).toFixed(2)+'"/>'+
+      '<text x="'+(x+bw/2).toFixed(1)+'" y="'+(y-6).toFixed(1)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#5C5C70">'+v+'</text>'+
+      '<text x="'+(x+bw/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="10" fill="#9A9AAC">'+labels[i]+'</text>';
+  }).join('');
+  return '<div class="chart-box"><div class="tt">'+title+'<span class="lg"><s style="background:'+color+'"></s>'+(legend||'')+'</span></div>'+
+    '<svg viewBox="0 0 '+W+' '+H+'">'+g+bars+'</svg></div>';
+}
+function donut(items,title){
+  const R=54,C=2*Math.PI*R;let off=0;
+  const total=items.reduce((a,b)=>a+b.v,0);
+  const arcs=items.map(it=>{
+    const len=it.v/total*C;
+    const s='<circle cx="80" cy="80" r="'+R+'" fill="none" stroke="'+it.c+'" stroke-width="18" stroke-dasharray="'+len.toFixed(1)+' '+(C-len).toFixed(1)+'" stroke-dashoffset="'+(-off).toFixed(1)+'" transform="rotate(-90 80 80)" stroke-linecap="butt"/>';
+    off+=len;return s;
+  }).join('');
+  return '<div class="chart-box" style="padding-bottom:14px"><div class="tt">'+title+'</div>'+
+   '<div style="display:flex;align-items:center;gap:8px;margin-top:6px">'+
+   '<svg viewBox="0 0 160 160" style="width:158px;flex-shrink:0;transform:rotate(0)">'+arcs+
+   '<text x="80" y="76" text-anchor="middle" font-size="20" font-weight="900" fill="#1B1B26">'+total.toLocaleString()+'</text>'+
+   '<text x="80" y="94" text-anchor="middle" font-size="10" fill="#9A9AAC">订单构成</text></svg>'+
+   '<div style="flex:1;display:flex;flex-direction:column;gap:9px">'+items.map(it=>'<div style="display:flex;align-items:center;gap:7px;font-size:12px">'+
+     '<s style="width:9px;height:9px;border-radius:3px;background:'+it.c+';display:inline-block;text-decoration:none"></s>'+
+     '<span style="flex:1;font-weight:600;color:var(--txt2)">'+it.n+'</span><b>'+it.v.toLocaleString()+'</b></div>').join('')+
+   '</div></div></div>';
+}
+
+/* ================= 1. 数据看板 ================= */
+function renderDash(id){
+  const kpi=statCards([
+    {lb:'今日 GMV',vl:'¥18.6万',sb:'环比昨日 +12.4%',i:'money',c:'#F0532B',cls:'up'},
+    {lb:'今日订单数',vl:'318',u:'单',sb:'课程套餐 216 · 实物 102',i:'receipt',c:'#7C3AED'},
+    {lb:'今日预约',vl:'186',u:'单',sb:'已到店 142 · 待核销 8',i:'calendar',c:'#2563EB'},
+    {lb:'卡项在途余额',vl:'¥486.2万',sb:'涉及 4,187 名会员',i:'card',c:'#0F9E56'}
+  ]);
+  const days=['09/09','09/10','09/11','09/12','09/13','09/14','09/15'];
+  const gmv=[128600,142300,138900,165200,172800,156400,186200];
+  const appt=[148,162,156,174,182,168,186];
+  let h=phHead('数据看板','集团整体经营概览 · 数据每 5 分钟同步一次，管理端与门店端口径一致',
+    '<div class="seg"><button class="on" onclick="segClick(this)">今日</button><button onclick="segClick(this)">本周</button><button onclick="segClick(this)">本月</button></div>'+
+    '<button class="btn btn-ghost" onclick="toast(\'已导出经营日报（原型演示）\')">'+svgIcon('download',14)+'导出日报</button>');
+  h+=kpi;
+  h+='<div class="chart-grid">';
+  h+='<div class="card">'+lineChart(gmv,days,'#F0532B','近 7 日营收趋势（元）','GMV')+'</div>';
+  h+='<div class="card" style="padding-bottom:6px"><div class="chart-box" style="padding-bottom:0"><div class="tt">门店营收排行（本月）<span class="lg">TOP 5</span></div></div>'+
+     [['深圳南山旗舰店','¥52.1万',52.1],['长沙岳麓中心店','¥38.6万',38.6],['武汉光谷店','¥33.8万',33.8],['深圳福田中心店','¥31.5万',31.5],['广州珠江新城店','¥27.3万',27.3]]
+      .map((x,i)=>'<div class="rank-li"><div class="no t'+(i+1)+'">'+(i+1)+'</div><div class="nm">'+x[0]+
+        '<div class="bar"><i style="width:'+Math.round(x[2]/52.1*100)+'%"></i></div></div><div class="vv">'+x[1]+'</div></div>').join('')+
+     '</div>';
+  h+='</div>';
+  h+='<div class="chart-grid g3">';
+  h+='<div class="card">'+barChart(appt,days,'#7C3AED','近 7 日预约量（单）','预约单')+'</div>';
+  h+='<div class="card">'+donut([{n:'课程套餐',v:216,c:'#F0532B'},{n:'实物商品',v:68,c:'#7C3AED'},{n:'单次课程券',v:34,c:'#2563EB'}],'今日订单构成')+'</div>';
+  h+='<div class="card"><div class="chart-box" style="padding-bottom:4px"><div class="tt">待办集中处理<span class="lg">实时</span></div></div>'+
+     [['待处理评价','27 条','reviews','#FFF1E3','⭐'],['待审核提现','5 笔 · ¥8,640','withdrawals','#F2EAFE','💰'],
+      ['投诉工单','6 单 · 超时 1 单','complaints','#FFE9EC','📢'],['退款审核','5 单 · ¥1.86 万','orders','#EAF0FF','💳'],
+      ['门店互评任务','9 月 · 参与率 68%','evalTasks','#E9F9F1','✅']]
+      .map(x=>'<div class="todo-li" onclick="go(\''+x[2]+'\')"><div class="ic" style="background:'+x[3]+'">'+x[4]+'</div>'+
+        '<div class="bd"><b>'+x[0]+'</b><span>'+x[1]+'</span></div><span class="arr">›</span></div>').join('')+
+     '</div>';
+  h+='</div>';
+  h+='<div class="panel"><div class="pn-head"><div class="tt">关键指标明细<em>（集团 / 各区域口径）</em></div>'+
+     '<div class="sp"><select class="sel" onchange="toast(\'已切换统计口径\')"><option>全部区域</option><option>长沙区域</option><option>武汉区域</option><option>华南区域</option></select></div></div>'+
+     '<div class="tw"><table class="tb"><thead><tr><th>区域</th><th>门店数</th><th>本月营收</th><th>本月订单</th><th>本月新增用户</th><th>会员复购率</th><th>平均客单价</th><th>目标达成</th></tr></thead><tbody>'+
+     [['长沙区域',4,'¥96.8万','3,268','4,286','62.4%','¥462',86],['武汉区域',2,'¥49.7万','1,842','2,140','58.2%','¥438',74],
+      ['华南区域（深圳/广州）',3,'¥133.6万','4,286','5,120','66.8%','¥512',84],['西南区域（成都）',1,'¥13.6万','512','620','42.6%','¥398',51]]
+      .map(x=>'<tr><td><div class="c-main" style="min-width:0"><div class="t">'+x[0]+'</div></div></td><td>'+x[1]+'</td>'+
+        '<td><span class="money o">'+x[2]+'</span></td><td>'+x[3]+'</td><td>'+x[4]+'</td><td>'+x[5]+'</td><td>'+x[6]+'</td>'+
+        '<td><div style="font-size:11.5px;font-weight:700">'+x[7]+'%</div><div class="bar"><i style="width:'+x[7]+'%"></i></div></td></tr>').join('')+
+     '</tbody></table></div></div>';
+  document.getElementById('pg_'+id).innerHTML=h;
+}
+function segClick(el){el.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('on'));el.classList.add('on');toast('已切换统计周期：'+el.textContent);}
+
+/* ================= 2. 组织架构 ================= */
+const ORG=[
+ {n:'了凡乐享集团总部',lv:1,m:'员工 24 人 · 直管 12 家门店',kids:[
+   {n:'长沙区域',lv:2,m:'4 家门店 · 员工 33 人',kids:[
+     {n:'长沙岳麓中心店',lv:3,m:'员工 12 人 · 王立群'},{n:'长沙谷山店',lv:3,m:'员工 9 人 · 周强'},
+     {n:'长沙梅溪湖店',lv:3,m:'员工 7 人 · 李明'},{n:'长沙高铁南站店',lv:3,m:'筹备中 · 员工 0 人'}]},
+   {n:'武汉区域',lv:2,m:'2 家门店 · 员工 17 人',kids:[
+     {n:'武汉光谷店',lv:3,m:'员工 11 人 · 赵静'},{n:'武汉汉街店',lv:3,m:'员工 6 人 · 孙磊'}]},
+   {n:'华南区域',lv:2,m:'3 家门店 · 员工 34 人',kids:[
+     {n:'深圳南山旗舰店',lv:3,m:'员工 15 人 · 陈思远'},{n:'深圳福田中心店',lv:3,m:'员工 10 人 · 林妍'},
+     {n:'广州天河店',lv:3,m:'员工 8 人 · 黄志强'},{n:'广州珠江新城店',lv:3,m:'员工 9 人 · 吴静怡'}]},
+   {n:'西南区域',lv:2,m:'1 家门店 · 员工 6 人',kids:[{n:'成都天府三街店',lv:3,m:'员工 6 人 · 郑凯'}]}
+ ]}
+];
+function renderOrg(id){
+  let h=phHead('组织架构','集团 → 区域 → 门店三级架构；组织节点决定数据权限范围与审批流转路径',
+    '<button class="btn btn-ghost" onclick="toast(\'已导出组织架构图（原型演示）\')">'+svgIcon('download',14)+'导出架构</button>'+
+    '<button class="btn btn-primary" onclick="toast(\'已打开「新增组织节点」表单（原型演示）\')">'+svgIcon('plus',14)+'新增组织节点</button>');
+  h+=statCards([
+    {lb:'组织层级',vl:'3',u:'级',sb:'集团 / 区域 / 门店',i:'sitemap',c:'#7C3AED'},
+    {lb:'区域数量',vl:'4',u:'个',sb:'长沙 / 武汉 / 华南 / 西南',i:'grid',c:'#2563EB'},
+    {lb:'门店数量',vl:'12',u:'家',sb:'营业中 10 · 筹备 1 · 停用 1',i:'store',c:'#F0532B'},
+    {lb:'在编员工',vl:'96',u:'人',sb:'康复师 58 · 前台与店长 38',i:'users',c:'#0F9E56'}
+  ]);
+  h+='<div class="chart-grid" style="grid-template-columns:1.6fr 1fr">';
+  h+='<div class="panel" style="margin:0"><div class="pn-head"><div class="tt">组织树<em>（点击节点查看详情）</em></div>'+
+    '<div class="sp"><button class="btn btn-ghost btn-sm" onclick="toast(\'已展开全部节点\')">展开全部</button></div></div><div class="tree">';
+  ORG.forEach(n1=>{
+    h+='<div class="tree-node tree-l1" onclick="orgPick(this,\''+n1.n+'\',\''+esc(n1.m)+'\')"><span class="tg">▾</span>'+
+       svgIcon('sitemap',15,'#7C3AED')+'<span class="nm">'+n1.n+'</span><span class="mt">'+n1.m+'</span></div>';
+    n1.kids.forEach(n2=>{
+      h+='<div class="tree-node tree-l2" onclick="orgPick(this,\''+n2.n+'\',\''+esc(n2.m)+'\')"><span class="tg">▾</span>'+
+         svgIcon('grid',15,'#2563EB')+'<span class="nm">'+n2.n+'</span><span class="mt">'+n2.m+'</span></div>';
+      n2.kids.forEach(n3=>{
+        h+='<div class="tree-node tree-l3" onclick="orgPick(this,\''+n3.n+'\',\''+esc(n3.m)+'\')"><span class="tg">·</span>'+
+           svgIcon('store',15,'#F0532B')+'<span class="nm">'+n3.n+'</span><span class="mt">'+n3.m+'</span></div>';
+      });
+    });
+  });
+  h+='</div></div>';
+  h+='<div class="panel" style="margin:0"><div class="pn-head"><div class="tt">节点详情</div></div><div class="kv">'+
+     '<div class="k">当前节点</div><div class="v" id="orgName">了凡乐享集团总部</div>'+
+     '<div class="k">节点说明</div><div class="v" id="orgMeta" style="font-weight:500;color:var(--txt2)">员工 24 人 · 直管 12 家门店</div>'+
+     '<div class="k">上级节点</div><div class="v">—</div>'+
+     '<div class="k">负责人</div><div class="v">王立群 · 集团总经理</div>'+
+     '<div class="k">数据权限</div><div class="v">可见下属全部区域与门店数据</div>'+
+     '<div class="k">审批流</div><div class="v"><span class="pill green">已启用</span> 三级审批（门店 → 区域 → 总部）</div></div>'+
+     '<div class="sec-t">该节点下关键指标</div><div class="kv" style="padding-top:0">'+
+     '<div class="k">本月营收</div><div class="v">¥286.4 万</div>'+
+     '<div class="k">本月订单</div><div class="v">9,908 单</div>'+
+     '<div class="k">会员总数</div><div class="v">19,268 人</div>'+
+     '<div class="k">卡项负债</div><div class="v">¥486.2 万</div></div></div>';
+  h+='</div>';
+  document.getElementById('pg_'+id).innerHTML=h;
+}
+function orgPick(el,n,m){
+  document.querySelectorAll('#pg_org .tree-node').forEach(x=>x.style.background='');
+  el.style.background='#F3EEFD';
+  document.getElementById('orgName').textContent=n;
+  document.getElementById('orgMeta').textContent=m;
+}
+
+/* ================= 3. 排班管理 ================= */
+const SCH_STAFF=[
+  {n:'王兴权',r:'首席康复师',s:'长沙岳麓中心店',v:['work','work','work','half','work','off','work']},
+  {n:'李娜',r:'资深康复师',s:'长沙岳麓中心店',v:['work','half','work','work','work','off','off']},
+  {n:'刘洋',r:'康复专家',s:'长沙岳麓中心店',v:['work','work','work','work','work','work','off']},
+  {n:'唐琪',r:'高级康复师',s:'长沙岳麓中心店',v:['off','work','work','work','half','work','work']},
+  {n:'冯娟',r:'康复师',s:'长沙岳麓中心店',v:['off','off','off','off','off','off','off']},
+  {n:'张敏',r:'前台主管',s:'长沙岳麓中心店',v:['work','work','work','work','work','half','work']}
+];
+function renderSchedule(id){
+  const days=['09-16 周三','09-17 周四','09-18 周五','09-19 周六','09-20 周日','09-21 周一','09-22 周二'];
+  let h=phHead('排班管理','门店排班决定用户端可预约时段；休息/半天班将自动关闭对应时段的可约名额',
+    '<select class="sel" onchange="toast(\'已切换门店：\'+this.value)"><option>长沙岳麓中心店</option><option>长沙谷山店</option><option>深圳南山旗舰店</option><option>武汉光谷店</option></select>'+
+    '<button class="btn btn-ghost" onclick="toast(\'已复制上周排班，可继续微调\')">复制上周</button>'+
+    '<button class="btn btn-primary" onclick="toast(\'排班已发布，用户端可预约时段已同步\')">发布排班</button>');
+  h+=statCards([
+    {lb:'本周可约时段',vl:'286',u:'个',sb:'较上周 +18 个',i:'clock',c:'#7C3AED'},
+    {lb:'在岗康复师',vl:'6',u:'人',sb:'休假 1 人（冯娟）',i:'users',c:'#2563EB'},
+    {lb:'时段预约填充率',vl:'68.4%',u:'',sb:'周末时段最紧张 92%',i:'calendar',c:'#F0532B',cls:'hl'},
+    {lb:'休息日设置',vl:'7',u:'天/人/月',sb:'符合劳动合规要求',i:'checkCircle',c:'#0F9E56'}
+  ]);
+  h+='<div class="panel"><div class="pn-head"><div class="tt">排班表 · 长沙岳麓中心店<em>（点击单元格可切换 上班 / 半天 / 休息）</em></div>'+
+     '<div class="sp"><span class="pill blue">上班</span><span class="pill amber">半天</span><span class="pill gray">休息</span></div></div>';
+  h+='<div class="sch"><table><thead><tr><th>康复师 / 前台</th>'+days.map(d=>'<th>'+d+'</th>').join('')+'</tr></thead><tbody>';
+  SCH_STAFF.forEach((st,si)=>{
+    h+='<tr><td><div class="c-person"><div class="av">'+initials(st.n)+'</div><div><div class="nm">'+st.n+'</div><div class="sub">'+st.r+'</div></div></div></td>';
+    st.v.forEach((v,di)=>{
+      const lb=v==='work'?'上班':v==='half'?'半天':'休息';
+      h+='<td><div class="cell '+v+'" onclick="schToggle(this,'+si+','+di+')">'+lb+'</div></td>';
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  h+='<div class="pager" style="border-top:1px solid var(--line)">共 6 名员工 · 7 天排班<div class="sp">'+
+     '<button class="btn btn-ghost btn-sm" onclick="toast(\'已批量设置：全体周日休息\')">批量设置周日休息</button>'+
+     '<button class="btn btn-ghost btn-sm" onclick="toast(\'已导出排班表（原型演示）\')">导出排班表</button></div></div></div>';
+  h+='<div class="panel"><div class="pn-head"><div class="tt">可预约时段容量<em>（用户端展示的时段名额由此计算）</em></div></div>'+
+     '<div class="tw"><table class="tb"><thead><tr><th>时段</th><th>可约名额</th><th>已约</th><th>剩余</th><th>填充率</th><th>状态</th></tr></thead><tbody>'+
+     [['09:00 – 10:00',18,16,2,89],['10:00 – 11:00',18,14,4,78],['11:00 – 12:00',12,7,5,58],
+      ['14:00 – 15:00',18,13,5,72],['15:00 – 16:00',18,15,3,83],['16:00 – 17:00',16,9,7,56],['19:00 – 20:00',10,8,2,80]]
+      .map(x=>'<tr><td style="font-weight:700;color:var(--txt)">'+x[0]+'</td><td>'+x[1]+'</td><td>'+x[2]+'</td>'+
+        '<td><b style="color:'+(x[3]<=2?'#DC3B3B':'#0F9E56')+'">'+x[3]+'</b></td>'+
+        '<td><div style="font-size:11.5px;font-weight:700">'+x[4]+'%</div><div class="bar"><i style="width:'+x[4]+'%"></i></div></td>'+
+        '<td><span class="pill '+(x[3]<=2?'red':'green')+'">'+(x[3]<=2?'名额紧张':'充足')+'</span></td></tr>').join('')+
+     '</tbody></table></div></div>';
+  document.getElementById('pg_'+id).innerHTML=h;
+}
+function schToggle(el,si,di){
+  const order=['work','half','off'],cur=order.findIndex(x=>el.classList.contains(x));
+  const nv=order[(cur+1)%3];
+  el.classList.remove('work','half','off');el.classList.add(nv);
+  el.textContent=nv==='work'?'上班':nv==='half'?'半天':'休息';
+  SCH_STAFF[si].v[di]=nv;
+  toast(SCH_STAFF[si].n+' 已改为「'+(nv==='work'?'上班':nv==='half'?'半天':'休息')+'」（未发布前不生效）');
+}
+
+/* ================= 4. 券包配置（后台配置项） ================= */
+const VPKG=[
+  {times:1,origin:500,gift:60},
+  {times:3,origin:1500,gift:280},
+  {times:5,origin:2500,gift:480},
+  {times:10,origin:5000,gift:1020},
+  {times:15,origin:7500,gift:1620},
+  {times:20,origin:10000,gift:2200}
+];
+function renderVoucher(id){
+  let h=phHead('券包配置','平台券包仅在此处配置，小程序端仅以「优惠券」形式呈现；购买课程套餐时系统自动按配置抵扣',
+    '<button class="btn btn-ghost" onclick="toast(\'已查看配置变更记录（原型演示）\')">变更记录</button>'+
+    '<button class="btn btn-primary" onclick="saveVoucherAll()">'+svgIcon('checkCircle',14)+'保存全部配置</button>');
+  h+=statCards([
+    {lb:'每月赠送券包',vl:'¥200',u:'/人/月',sb:'每月 1 日自动发放',i:'gift',c:'#7C3AED'},
+    {lb:'本月券包发放',vl:'19,268',u:'张',sb:'覆盖全部注册用户',i:'ticket',c:'#2563EB'},
+    {lb:'本月券包抵扣金额',vl:'¥86.4万',sb:'占课程套餐 GMV 38.6%',i:'money',c:'#F0532B',cls:'up'},
+    {lb:'券包使用率',vl:'46.2%',u:'',sb:'较上月 +4.8%',i:'checkCircle',c:'#0F9E56'}
+  ]);
+  h+='<div class="hint-box">'+svgIcon('shield',15,'#5B26A8',2)+
+     '<div>券包为<em>平台侧营销配置</em>：用户端不展示券包商城与余额流水，仅在「我的优惠券」中看到券包券；购买课程套餐结算时，系统按下方「券包立减」金额自动抵扣。</div></div>';
+
+  h+='<div class="panel"><div class="pn-head"><div class="tt">每月赠送券包<em>（新用户注册当月即时赠送，次月起每月 1 日发放）</em></div>'+
+     '<div class="sp"><span style="font-size:12.5px;font-weight:700;color:var(--txt2)">启用状态</span>'+
+     '<div class="switch on" onclick="sw(this)"><i></i></div></div></div>'+
+     '<div class="md-body" style="padding:18px 16px 20px"><div class="form-grid">'+
+     '<div class="fi"><label>赠送金额（元）<i>*</i></label><input id="vp_month" value="200" class="num"></div>'+
+     '<div class="fi"><label>发放时间</label><select><option>每月 1 日 00:00 自动发放</option><option>每月 1 日 10:00 自动发放</option></select></div>'+
+     '<div class="fi"><label>有效期规则</label><select><option>当月有效（次月 1 日失效）</option><option>领取后 30 天内有效</option></select></div>'+
+     '<div class="fi"><label>使用门槛</label><select><option>无门槛，购买课程套餐自动抵扣</option><option>满 ¥1,000 可用</option></select></div>'+
+     '<div class="fi"><label>叠加规则</label><select><option>可与其他优惠券叠加使用</option><option>不可与其他优惠券叠加</option></select></div>'+
+     '<div class="fi"><label>适用门店</label><select><option>全部门店</option><option>仅直营门店</option></select></div>'+
+     '<div class="fi full"><label>用户端展示文案</label><input value="每月平台赠送 · 结算时自动抵扣"></div>'+
+     '</div></div></div>';
+
+  h+='<div class="panel"><div class="pn-head"><div class="tt">课程套餐券包立减配置<em>（6 档套餐 · 实付金额由系统自动计算）</em></div>'+
+     '<div class="sp"><button class="btn btn-ghost btn-sm" onclick="toast(\'已按比例重置为系统推荐值\')">重置推荐值</button></div></div>'+
+     '<div class="vp-row head"><div>套餐档位</div><div>套餐原价</div><div>券包立减</div><div>实付金额与说明</div></div>';
+  VPKG.forEach((p,i)=>{
+    h+='<div class="vp-row"><div class="nm">'+(p.times===1?'单次课':p.times+' 次课')+'</div>'+
+       '<div style="font-size:12.5px;font-weight:700;color:var(--txt2)" class="num">¥'+p.origin.toLocaleString()+'</div>'+
+       '<div><input id="vp_'+i+'" value="'+p.gift+'" class="num" oninput="recalcVp('+i+')"></div>'+
+       '<div class="calc" id="vpc_'+i+'"></div></div>';
+  });
+  h+='<div class="pager" style="border-top:1px solid var(--line)"><div style="color:var(--txt2);font-weight:600">说明：券包立减金额需 ≤ 套餐原价，保存后立即对小程序端生效。</div>'+
+     '<div class="sp"><button class="btn btn-primary btn-sm" onclick="saveVoucherPack()">保存档位配置</button></div></div></div>';
+
+  h+='<div class="panel"><div class="pn-head"><div class="tt">券包发放与使用明细<em>（近 4 个月）</em></div>'+
+     '<div class="sp"><button class="btn btn-ghost btn-sm" onclick="toast(\'已导出明细（原型演示）\')">导出明细</button></div></div>'+
+     '<div class="tw"><table class="tb"><thead><tr><th>月份</th><th>发放张数</th><th>已使用</th><th>抵扣金额</th><th>使用率</th><th>带动套餐 GMV</th></tr></thead><tbody>'+
+     [['2026-09',19268,8902,'¥86.4万',46.2,'¥223.8万'],['2026-08',18420,7620,'¥72.6万',41.4,'¥196.4万'],
+      ['2026-07',17680,6862,'¥64.2万',38.8,'¥172.8万'],['2026-06',16840,6120,'¥58.4万',36.3,'¥156.2万']]
+      .map(x=>'<tr><td style="font-weight:700;color:var(--txt)">'+x[0]+'</td><td>'+x[1].toLocaleString()+'</td><td>'+x[2].toLocaleString()+'</td>'+
+        '<td><span class="money o">'+x[3]+'</span></td><td><div style="font-size:11.5px;font-weight:700">'+x[4]+'%</div><div class="bar"><i style="width:'+x[4]+'%"></i></div></td>'+
+        '<td><span class="money">'+x[5]+'</span></td></tr>').join('')+
+     '</tbody></table></div></div>';
+  document.getElementById('pg_'+id).innerHTML=h;
+  VPKG.forEach((p,i)=>recalcVp(i));
+}
+function recalcVp(i){
+  const p=VPKG[i],v=Number(elv('vp_'+i))||0;
+  const pay=Math.max(0,p.origin-v);
+  const cell=document.getElementById('vpc_'+i);
+  if(cell)cell.innerHTML='实付 <b>¥'+pay.toLocaleString()+'</b>　（原价 ¥'+p.origin.toLocaleString()+' − 券包 ¥'+v.toLocaleString()+'）';
+}
+function saveVoucherPack(){
+  VPKG.forEach((p,i)=>{p.gift=Number(elv('vp_'+i))||0;});
+  toast('6 档套餐券包立减配置已保存，小程序端结算规则已同步');
+}
+function saveVoucherAll(){
+  VPKG.forEach((p,i)=>{p.gift=Number(elv('vp_'+i))||0;});
+  toast('券包配置已全部保存：每月赠送 ¥'+(elv('vp_month')||'200')+' + 6 档套餐立减规则');
+}
+function sw(el){el.classList.toggle('on');toast('设置已'+(el.classList.contains('on')?'开启':'关闭'));}
+
+/* ================= 5. 积点与成长值 ================= */
+const PT_RULES=[
+  {n:'分享内容到微信',v:20,limit:'每日上限 60',on:1},
+  {n:'邀请好友注册',v:200,limit:'不设上限',on:1},
+  {n:'完成服务后评价',v:50,limit:'每单 1 次',on:1},
+  {n:'每日签到',v:5,limit:'每日 1 次',on:1},
+  {n:'完善健康档案',v:100,limit:'一次性',on:1},
+  {n:'生日当月到店',v:300,limit:'每年 1 次',on:0}
+];
+const LV=[
+  {n:'普通会员',g:'0 – 999',d:'无折扣',b:'—'},
+  {n:'银卡会员',g:'1,000 – 4,999',d:'9.5 折',b:'生日礼券 ¥200'},
+  {n:'金卡会员',g:'5,000 – 9,999',d:'9.0 折',b:'生日礼券 ¥300 + 优先预约'},
+  {n:'黑金会员',g:'10,000 以上',d:'8.5 折',a:'专属康复师 + 免排队'},
+  {n:'黑金会员',g:'10,000 以上',d:'8.5 折',b:'专属康复师 + 免排队 + 生日礼券 ¥500'}
+];
+let PT_TAB='rule';
+function renderPoints(id){
+  let h=phHead('积点与成长值','积点用于平台抵扣现金，成长值决定会员等级与权益；规则调整后立即对小程序端生效',
+    '<button class="btn btn-ghost" onclick="go(\'members\')">积点流水查询</button>'+
+    '<button class="btn btn-primary" onclick="toast(\'积点与成长值规则已保存并同步小程序端\')">'+svgIcon('checkCircle',14)+'保存规则</button>');
+  h+=statCards([
+    {lb:'积点发放总量',vl:'2,846万',u:'点',sb:'本月新增 286 万点',i:'coin',c:'#7C3AED'},
+    {lb:'积点抵扣比例',vl:'100 : 1',u:'',sb:'100 积点 = ¥1，单笔最多抵扣 20%',i:'money',c:'#F0532B',cls:'hl'},
+    {lb:'本月积点抵扣',vl:'¥28.4万',sb:'占 GMV 9.9%',i:'checkCircle',c:'#0F9E56'},
+    {lb:'会员等级分布',vl:'黑金 8%',u:'',sb:'金卡 22% · 银卡 34% · 普通 36%',i:'users',c:'#2563EB'}
+  ]);
+  h+='<div class="panel"><div class="tabs">'+
+     ['rule:积点获取规则','level:会员等级与权益','flow:积点流水'].map(x=>{
+       const p=x.split(':');
+       return '<button class="'+(PT_TAB===p[0]?'on':'')+'" onclick="PT_TAB=\''+p[0]+'\';renderPoints(\''+id+'\')">'+p[1]+'</button>';
+     }).join('')+'</div><div id="pt_body"></div></div>';
+  h+='<div class="chart-grid g3">'+
+     '<div class="card">'+barChart([860,1240,1120,1480,1620,1380,1680],['周一','周二','周三','周四','周五','周六','周日'],'#7C3AED','近 7 日积点发放（千点）','发放')+'</div>'+
+     '<div class="card">'+donut([{n:'商城抵扣',v:4286,c:'#F0532B'},{n:'课程套餐抵扣',v:2680,c:'#7C3AED'},{n:'券叠加抵扣',v:1120,c:'#2563EB'}],'积点使用去向')+'</div>'+
+     '<div class="card" style="padding-bottom:4px"><div class="chart-box" style="padding-bottom:0"><div class="tt">积点异常监控<span class="lg">近 7 日</span></div></div>'+
+     '<div class="kv" style="padding:12px 16px 16px"><div class="k">异常发放</div><div class="v"><span class="pill red">2 笔</span> 疑似刷分享</div>'+
+     '<div class="k">异常抵扣</div><div class="v"><span class="pill amber">1 笔</span> 单笔超 20% 上限</div>'+
+     '<div class="k">处理状态</div><div class="v"><span class="pill green">已处理 3 笔</span></div>'+
+     '<div class="k">风控策略</div><div class="v">同一设备 24 小时分享上限 3 次</div></div></div></div>';
+  document.getElementById('pg_'+id).innerHTML=h;
+  renderPtBody();
+}
+function renderPtBody(){
+  const b=document.getElementById('pt_body');if(!b)return;
+  if(PT_TAB==='rule'){
+    b.innerHTML='<div class="tw"><table class="tb"><thead><tr><th>获取行为</th><th>积点值</th><th>次数限制</th><th>生效状态</th><th>操作</th></tr></thead><tbody>'+
+      PT_RULES.map((r,i)=>'<tr><td><div class="c-main" style="min-width:0"><div class="t">'+r.n+'</div></div></td>'+
+        '<td><b class="num" style="color:var(--orange)">'+r.v+' 点</b></td><td>'+r.limit+'</td>'+
+        '<td>'+(r.on?'<span class="pill green">已启用</span>':'<span class="pill gray">已停用</span>')+'</td>'+
+        '<td><div class="ops"><button class="btn btn-ghost btn-sm" onclick="ptEdit('+i+')">编辑</button>'+
+        '<button class="btn btn-ghost btn-sm" onclick="ptToggle('+i+')">'+(r.on?'停用':'启用')+'</button></div></td></tr>').join('')+
+      '</tbody></table></div>'+
+      '<div class="md-body" style="padding:16px"><div class="hint-box orange">'+svgIcon('alert',15,'#B4431C',2)+
+      '<div>抵扣规则：<em>100 积点 = ¥1</em>，单笔订单最多抵扣订单金额的 20%，积点不可提现、不可转让。</div></div>'+
+      '<div class="form-grid"><div class="fi"><label>每 100 积点抵扣金额（元）</label><input value="1"></div>'+
+      '<div class="fi"><label>单笔最大抵扣比例</label><select><option>20%</option><option>30%</option><option>50%</option></select></div>'+
+      '<div class="fi"><label>积点有效期</label><select><option>当年度有效</option><option>永久有效</option><option>24 个月</option></select></div>'+
+      '<div class="fi"><label>是否可与其他优惠叠加</label><select><option>可与优惠券、券包叠加</option><option>不可叠加</option></select></div></div></div>';
+  }else if(PT_TAB==='level'){
+    b.innerHTML='<div class="tw"><table class="tb"><thead><tr><th>会员等级</th><th>成长值门槛</th><th>折扣权益</th><th>附加权益</th><th>会员数</th><th>操作</th></tr></thead><tbody>'+
+      [['普通会员','0 – 999','无折扣','—','6,940'],['银卡会员','1,000 – 4,999','9.5 折','生日礼券 ¥200','6,551'],
+       ['金卡会员','5,000 – 9,999','9.0 折','生日礼券 ¥300 + 优先预约','4,240'],['黑金会员','10,000 以上','8.5 折','专属康复师 + 免排队 + 生日礼券 ¥500','1,537']]
+      .map(x=>'<tr><td><div style="font-weight:700;color:var(--txt)">'+x[0]+'</div></td><td class="num">'+x[1]+'</td>'+
+        '<td><span class="pill amber">'+x[2]+'</span></td><td style="color:var(--txt2)">'+x[3]+'</td><td class="num">'+x[4]+' 人</td>'+
+        '<td><div class="ops"><button class="btn btn-ghost btn-sm" onclick="toast(\'已打开等级权益编辑（原型演示）\')">编辑权益</button></div></td></tr>').join('')+
+      '</tbody></table></div>'+
+      '<div class="md-body" style="padding:16px"><div class="form-grid">'+
+      '<div class="fi"><label>成长值获取</label><select><option>消费 ¥1 = 1 成长值</option><option>消费 ¥1 = 2 成长值</option></select></div>'+
+      '<div class="fi"><label>等级有效期</label><select><option>永久有效（不降级）</option><option>按自然年度重新计算</option></select></div>'+
+      '<div class="fi"><label>降级保护期</label><select><option>不设保护期</option><option>90 天缓冲期</option></select></div>'+
+      '<div class="fi"><label>升级提醒</label><select><option>升级时推送订阅消息</option><option>不推送</option></select></div></div></div>';
+  }else{
+    b.innerHTML='<div class="hit">近 7 日积点流水共 <b>28,640</b> 条<span class="ck">按时间倒序</span></div>'+
+      '<div class="tw"><table class="tb"><thead><tr><th>时间</th><th>会员</th><th>类型</th><th>积点变动</th><th>余额</th><th>说明</th></tr></thead><tbody>'+
+      [['2026-09-15 11:20','林小凡','发放','+50','2,680','完成服务后评价'],
+       ['2026-09-15 10:42','王小明','抵扣','-1,000','620','购买 3 次体验套餐抵扣 ¥10'],
+       ['2026-09-15 10:02','周雨彤','发放','+20','1,560','分享内容到微信'],
+       ['2026-09-15 09:36','陈一鸣','发放','+5','1,180','每日签到'],
+       ['2026-09-14 20:14','刘亦辰','发放','+200','210','邀请好友注册'],
+       ['2026-09-14 18:52','李佳','抵扣','-600','840','购买实物商品抵扣 ¥6'],
+       ['2026-09-14 15:08','赵婷婷','发放','+100','980','完善健康档案']]
+      .map(x=>'<tr><td>'+x[0]+'</td><td><div class="c-person"><div class="av">'+initials(x[1])+'</div><div><div class="nm">'+x[1]+'</div></div></div></td>'+
+        '<td><span class="pill '+(x[2]==='发放'?'green':'amber')+'">'+x[2]+'</span></td>'+
+        '<td><b style="color:'+(x[3].indexOf('-')===0?'var(--green)':'var(--orange)')+'">'+x[3]+'</b></td>'+
+        '<td class="num">'+x[4]+'</td><td style="color:var(--txt2)">'+x[5]+'</td></tr>').join('')+
+      '</tbody></table></div>';
+  }
+}
+function ptEdit(i){
+  const r=PT_RULES[i];
+  openModalBox('<div class="md-head"><div style="flex:1"><h3>编辑积点规则</h3><div class="sub">'+r.n+'</div></div>'+
+    '<button class="x" onclick="closeModal()">✕</button></div><div class="md-body"><div class="form-grid">'+
+    '<div class="fi"><label>行为名称</label><input id="ff_n" value="'+r.n+'"></div>'+
+    '<div class="fi"><label>积点值</label><input id="ff_v" type="number" value="'+r.v+'"></div>'+
+    '<div class="fi"><label>次数限制</label><input id="ff_limit" value="'+r.limit+'"></div>'+
+    '<div class="fi"><label>生效状态</label><select id="ff_on"><option'+(r.on?' selected':'')+'>已启用</option><option'+(!r.on?' selected':'')+'>已停用</option></select></div>'+
+    '<div class="fi full"><label>规则说明（用户端展示）</label><textarea id="ff_note">'+r.n+'可获得 '+r.v+' 积点</textarea></div>'+
+    '</div></div><div class="md-foot"><div class="lf">修改后立即生效</div><button class="btn btn-ghost" onclick="closeModal()">取消</button>'+
+    '<button class="btn btn-primary" onclick="ptSave('+i+')">保存</button></div>');
+}
+function ptSave(i){
+  PT_RULES[i].n=val('n')||PT_RULES[i].n;
+  PT_RULES[i].v=Number(val('v'))||PT_RULES[i].v;
+  PT_RULES[i].limit=val('limit')||PT_RULES[i].limit;
+  PT_RULES[i].on=val('on')==='已启用';
+  closeModal();renderPoints('points');toast('积点规则已保存');
+}
+function ptToggle(i){PT_RULES[i].on=PT_RULES[i].on?0:1;renderPoints('points');toast('规则已'+(PT_RULES[i].on?'启用':'停用'));}
+
+/* ================= 6. 门店互评任务（平台下发） ================= */
+const EVAL_STORES=[
+  {n:'长沙岳麓中心店',people:12,submit:12,rate:100},
+  {n:'长沙谷山店',people:9,submit:7,rate:78},
+  {n:'深圳南山旗舰店',people:15,submit:12,rate:80},
+  {n:'武汉光谷店',people:11,submit:6,rate:55},
+  {n:'广州天河店',people:8,submit:3,rate:38},
+  {n:'成都天府三街店',people:6,submit:1,rate:17}
+];
+/* 互评原始数据（管理端可见的「谁评谁」明细，含评分与文字评价；任务整体匿名聚合见 openEvalRecords） */
+const EVAL_RECORDS=[
+  {id:'ER001',from:'王兴权',fr:'店长',to:'李娜',tr:'康复师',store:'长沙岳麓中心店',att:4.9,pro:4.8,col:4.7,time:'2026-09-02',cm:'响应及时，专业讲解清晰，协作顺畅'},
+  {id:'ER002',from:'李娜',fr:'康复师',to:'王兴权',tr:'店长',store:'长沙岳麓中心店',att:4.6,pro:4.9,col:4.8,time:'2026-09-03',cm:'管理有条理，排班合理'},
+  {id:'ER003',from:'张敏',fr:'康复师',to:'李娜',tr:'康复师',store:'长沙岳麓中心店',att:4.8,pro:4.7,col:4.9,time:'2026-09-05',cm:'手法专业，顾客反馈好'},
+  {id:'ER004',from:'陈静',fr:'前台',to:'张敏',tr:'康复师',store:'长沙岳麓中心店',att:4.7,pro:4.6,col:4.8,time:'2026-09-08',cm:'配合默契，交接清楚'},
+  {id:'ER005',from:'王兴权',fr:'店长',to:'张敏',tr:'康复师',store:'长沙岳麓中心店',att:4.9,pro:5.0,col:4.7,time:'2026-09-11',cm:'本月业绩突出，专业度很高'},
+  {id:'ER006',from:'李娜',fr:'康复师',to:'陈静',tr:'前台',store:'长沙岳麓中心店',att:4.5,pro:4.6,col:4.7,time:'2026-08-29',cm:'接待热情，引导到位'},
+  {id:'ER007',from:'刘洋',fr:'康复师',to:'周强',tr:'店长',store:'长沙谷山店',att:4.8,pro:4.9,col:4.8,time:'2026-09-04',cm:'店长支持到位'},
+  {id:'ER008',from:'周强',fr:'店长',to:'刘洋',tr:'康复师',store:'长沙谷山店',att:4.6,pro:4.5,col:4.7,time:'2026-09-06',cm:'技术扎实，可再加强沟通'},
+  {id:'ER009',from:'赵磊',fr:'康复师',to:'孙悦',tr:'前台',store:'长沙谷山店',att:4.7,pro:4.6,col:4.6,time:'2026-09-09',cm:'前台配合不错'},
+  {id:'ER010',from:'孙悦',fr:'前台',to:'赵磊',tr:'康复师',store:'长沙谷山店',att:4.6,pro:4.7,col:4.5,time:'2026-09-10',cm:'专业且有耐心'},
+  {id:'ER011',from:'刘洋',fr:'康复师',to:'赵磊',tr:'康复师',store:'长沙谷山店',att:4.9,pro:4.8,col:4.9,time:'2026-08-27',cm:'同事间互相学习氛围好'},
+  {id:'ER012',from:'周强',fr:'店长',to:'孙悦',tr:'前台',store:'长沙谷山店',att:4.5,pro:4.4,col:4.6,time:'2026-09-13',cm:'接待流程熟练'},
+  {id:'ER013',from:'唐琪',fr:'康复师',to:'吴婷',tr:'店长',store:'深圳南山旗舰店',att:4.7,pro:4.8,col:4.6,time:'2026-09-03',cm:'店长统筹能力强'},
+  {id:'ER014',from:'吴婷',fr:'店长',to:'唐琪',tr:'康复师',store:'深圳南山旗舰店',att:4.6,pro:4.7,col:4.5,time:'2026-09-07',cm:'专业能力突出'},
+  {id:'ER015',from:'郑昊',fr:'康复师',to:'黄蓉',tr:'前台',store:'深圳南山旗舰店',att:4.8,pro:4.7,col:4.8,time:'2026-09-12',cm:'前台响应快'},
+  {id:'ER016',from:'黄蓉',fr:'前台',to:'郑昊',tr:'康复师',store:'深圳南山旗舰店',att:4.5,pro:4.6,col:4.7,time:'2026-09-14',cm:'专业细致'},
+  {id:'ER017',from:'唐琪',fr:'康复师',to:'郑昊',tr:'康复师',store:'深圳南山旗舰店',att:4.9,pro:4.9,col:4.8,time:'2026-09-01',cm:'技术标杆'},
+  {id:'ER018',from:'吴婷',fr:'店长',to:'黄蓉',tr:'前台',store:'深圳南山旗舰店',att:4.4,pro:4.5,col:4.6,time:'2026-08-28',cm:'服务态度好'},
+  {id:'ER019',from:'林峰',fr:'店长',to:'何洁',tr:'康复师',store:'武汉光谷店',att:4.6,pro:4.7,col:4.5,time:'2026-09-05',cm:'康复师专业度好'},
+  {id:'ER020',from:'何洁',fr:'康复师',to:'林峰',tr:'店长',store:'武汉光谷店',att:4.5,pro:4.6,col:4.7,time:'2026-09-09',cm:'管理细致'},
+  {id:'ER021',from:'罗刚',fr:'康复师',to:'杨梅',tr:'前台',store:'武汉光谷店',att:4.4,pro:4.5,col:4.6,time:'2026-09-12',cm:'前台配合尚可'},
+  {id:'ER022',from:'杨梅',fr:'前台',to:'罗刚',tr:'康复师',store:'武汉光谷店',att:4.3,pro:4.4,col:4.5,time:'2026-09-15',cm:'专业度有待提升'},
+  {id:'ER023',from:'林峰',fr:'店长',to:'罗刚',tr:'康复师',store:'武汉光谷店',att:4.7,pro:4.6,col:4.6,time:'2026-08-30',cm:'潜力不错'},
+  {id:'ER024',from:'许伟',fr:'店长',to:'邓超',tr:'康复师',store:'广州天河店',att:4.5,pro:4.6,col:4.4,time:'2026-09-06',cm:'康复师负责'},
+  {id:'ER025',from:'邓超',fr:'康复师',to:'许伟',tr:'店长',store:'广州天河店',att:4.3,pro:4.4,col:4.5,time:'2026-09-10',cm:'管理需更主动'},
+  {id:'ER026',from:'冯雪',fr:'康复师',to:'韩雷',tr:'前台',store:'广州天河店',att:4.2,pro:4.3,col:4.4,time:'2026-09-13',cm:'前台可再积极'},
+  {id:'ER027',from:'韩雷',fr:'前台',to:'冯雪',tr:'康复师',store:'广州天河店',att:4.1,pro:4.2,col:4.3,time:'2026-09-15',cm:'专业度一般'},
+  {id:'ER028',from:'曹颖',fr:'店长',to:'彭勇',tr:'康复师',store:'成都天府三街店',att:4.4,pro:4.5,col:4.3,time:'2026-09-08',cm:'康复师踏实'},
+  {id:'ER029',from:'彭勇',fr:'康复师',to:'曹颖',tr:'店长',store:'成都天府三街店',att:4.2,pro:4.3,col:4.4,time:'2026-09-11',cm:'管理细致'},
+  {id:'ER030',from:'董洁',fr:'康复师',to:'袁泉',tr:'前台',store:'成都天府三街店',att:4.3,pro:4.2,col:4.4,time:'2026-09-14',cm:'前台配合好'}
+];
+let EVAL_FILTER={store:'全部门店',from:'',to:'',kw:''};
+let EVAL_ON=true,EVAL_DIMS=['服务态度','专业能力','协作配合'];
+function renderEvalTasks(id){
+  let h=phHead('门店互评任务','平台按月下发门店互评任务，员工端工作台出现入口，本店全员互评（不含本人）；未提交前入口持续显示，提交后自动消失',
+    '<button class="btn btn-ghost" onclick="openEvalRecords()">评价结果汇总</button>'+
+    (EVAL_ON?'<button class="btn btn-ghost" onclick="toast(\'已向未提交人员发送催办提醒（小程序订阅消息）\')">一键催办</button>'+
+      '<button class="btn btn-danger" onclick="setEval(false)">结束任务</button>'
+     :'<button class="btn btn-primary" onclick="setEval(true)">'+svgIcon('plus',14)+'下发本月任务</button>'));
+  h+=statCards([
+    {lb:'当前任务状态',vl:EVAL_ON?'进行中':'未下发',u:'',sb:EVAL_ON?'9 月门店互评 · 截止 09-30 23:59':'点击右上角下发任务',i:'checkCircle',c:EVAL_ON?'#0F9E56':'#9A9AAC',cls:EVAL_ON?'':'hl'},
+    {lb:'参与门店',vl:'12',u:'家',sb:'应参与 61 人 · 已提交 41 人',i:'store',c:'#7C3AED'},
+    {lb:'整体提交率',vl:'68%',u:'',sb:'较上月 +6%',i:'grid',c:'#2563EB'},
+    {lb:'待提交人数',vl:'20',u:'人',sb:'已自动催办 2 次',i:'alert',c:'#F0532B',cls:'up'}
+  ]);
+  h+='<div class="hint-box">'+svgIcon('checkCircle',15,'#5B26A8',2)+
+     '<div>任务由<em>平台后台</em>统一下发，店长无权下发；下发后员工端「工作台」顶部出现互评卡片，显示<em>开始 – 截止时间</em>与评价进度，本人提交完成后该板块消失。</div></div>';
+  h+='<div class="panel"><div class="pn-head"><div class="tt">任务配置<em>（下发后即时生效）</em></div>'+
+     '<div class="sp"><span style="font-size:12.5px;font-weight:700;color:var(--txt2)">当前状态</span>'+
+     '<span class="pill '+(EVAL_ON?'green':'gray')+'">'+(EVAL_ON?'已下发 · 进行中':'未下发')+'</span></div></div>'+
+     '<div class="md-body" style="padding:18px 16px 8px"><div class="form-grid">'+
+     '<div class="fi"><label>任务名称</label><input value="9 月门店互评"></div>'+
+     '<div class="fi"><label>任务周期</label><input value="2026-09-01 00:00 至 2026-09-30 23:59"></div>'+
+     '<div class="fi"><label>下发范围</label><select><option>全部门店（12 家）</option><option>仅直营门店（8 家）</option><option>指定门店</option></select></div>'+
+     '<div class="fi"><label>参与角色</label><select><option>康复师 / 前台 / 店长（全员）</option><option>仅康复师</option><option>康复师 + 前台</option></select></div>'+
+     '<div class="fi"><label>评价对象范围</label><select><option>本店全部同事（不含本人）</option><option>本店同角色同事</option></select></div>'+
+     '<div class="fi"><label>是否匿名</label><select><option>完全匿名（不展示评价人）</option><option>实名评价</option></select></div>'+
+     '<div class="fi full"><label>评价维度（员工端打分项）</label><div style="display:flex;gap:18px;flex-wrap:wrap;padding-top:4px">'+
+     EVAL_DIMS.map(d=>'<label class="chk"><input type="checkbox" checked onchange="toast(\'维度「'+d+'」已'+(this.checked?'启用':'停用')+'\')">'+d+'（3 星打分 + 文字评价）</label>').join('')+
+     '</div></div>'+
+     '<div class="fi"><label>结果可见范围</label><select><option>仅平台管理员可见</option><option>店长可见本店</option><option>员工可见本人得分</option></select></div>'+
+     '<div class="fi"><label>是否计入绩效</label><select><option>计入绩效（权重 10%）</option><option>不计入绩效</option></select></div>'+
+     '</div></div>'+
+     '<div class="pager" style="border-top:1px solid var(--line)"><div class="lf" style="font-size:11.5px;color:var(--txt3);margin-right:auto">修改配置后需重新下发才生效</div>'+
+     '<button class="btn btn-ghost" onclick="toast(\'已保存为草稿\')">保存草稿</button>'+
+     '<button class="btn btn-primary" onclick="setEval(true)">'+(EVAL_ON?'重新下发任务':'立即下发任务')+'</button></div></div>';
+
+  h+='<div class="panel"><div class="pn-head"><div class="tt">各门店提交进度<em>（共 12 家 · 展示前 6 家）</em></div>'+
+     '<div class="sp"><select class="sel"><option>全部区域</option><option>长沙区域</option><option>华南区域</option></select>'+
+     '<button class="btn btn-ghost btn-sm" onclick="toast(\'已导出互评进度（原型演示）\')">导出进度</button></div></div>'+
+     '<div class="tw"><table class="tb"><thead><tr><th>门店</th><th>应参与</th><th>已提交</th><th>提交率</th><th>状态</th><th>操作</th></tr></thead><tbody>'+
+     EVAL_STORES.map((s,i)=>'<tr><td><div class="c-main" style="min-width:0"><div class="t">'+s.n+'</div></div></td>'+
+       '<td>'+s.people+' 人</td><td>'+s.submit+' 人</td>'+
+       '<td><div style="font-size:11.5px;font-weight:700">'+s.rate+'%</div><div class="bar"><i style="width:'+s.rate+'%"></i></div></td>'+
+       '<td><span class="pill '+(s.rate>=100?'green':s.rate>=60?'amber':'red')+'">'+(s.rate>=100?'已完成':s.rate>=60?'进行中':'进度滞后')+'</span></td>'+
+       '<td><div class="ops"><button class="btn btn-ghost btn-sm" onclick="toast(\'已向 '+s.n+' 未提交员工发送催办\')">催办</button>'+
+       '<button class="btn btn-ghost btn-sm" onclick="evalStoreFocus(\''+s.n+'\')">查看结果</button></div></td></tr>').join('')+
+     '</tbody></table></div></div>';
+  h+='<div class="panel" id="evalDetailPanel"><div class="pn-head"><div class="tt">互评数据明细<em>（谁评谁 · 含评分 · 可按门店与时间段筛选）</em></div>'+
+     '<div class="sp"><button class="btn btn-ghost btn-sm" onclick="evalExport()">'+svgIcon('download',14)+'导出明细</button></div></div>'+
+     '<div class="flt">'+
+       '<select class="sel" id="evalStoreSel" onchange="evalApplyFilter()"><option value="全部门店">全部门店</option>'+
+         EVAL_STORES.map(s=>'<option value="'+s.n+'">'+s.n+'</option>').join('')+
+       '</select>'+
+       '<input class="ipt" id="evalFrom" type="date" onchange="evalApplyFilter()">'+
+       '<span class="sep">至</span>'+
+       '<input class="ipt" id="evalTo" type="date" onchange="evalApplyFilter()">'+
+       '<input class="ipt" id="evalKw" type="text" placeholder="评价人 / 被评人 姓名" style="max-width:190px">'+
+       '<button class="btn btn-primary btn-sm" onclick="evalApplyFilter()">查询</button>'+
+       '<button class="btn btn-ghost btn-sm" onclick="evalResetFilter()">重置</button>'+
+     '</div>'+
+     '<div id="evalDetailBody"></div></div>';
+  document.getElementById('pg_'+id).innerHTML=h;
+  renderEvalDetailBody();
+}
+function setEval(on){
+  EVAL_ON=on;
+  renderEvalTasks('evalTasks');
+  toast(on?'已下发「9 月门店互评」任务：员工端工作台已出现互评入口（09/01 – 09/30）':'任务已结束，员工端互评入口已隐藏');
+}
+function openEvalRecords(){
+  let h='<div class="md-head"><div style="flex:1"><h3>互评结果汇总</h3><div class="sub">9 月门店互评 · 已提交 41 人 · 数据完全匿名聚合</div></div>'+
+    '<button class="x" onclick="closeModal()">✕</button></div><div class="md-body">'+
+    '<div class="hint-box">'+svgIcon('shield',15,'#5B26A8',2)+'<div>展示为匿名聚合结果，仅平台管理员可见；可导出后与店长一对一沟通使用。</div></div>'+
+    '<table class="tb"><thead><tr><th>员工</th><th>门店</th><th>服务态度</th><th>专业能力</th><th>协作配合</th><th>综合得分</th></tr></thead><tbody>'+
+    [['王兴权','长沙岳麓中心店',4.9,4.9,4.8,'4.87'],['李娜','长沙岳麓中心店',4.8,4.9,4.7,'4.80'],
+     ['刘洋','长沙谷山店',4.9,5.0,4.8,'4.90'],['唐琪','深圳南山旗舰店',4.7,4.8,4.6,'4.70'],
+     ['张敏','长沙岳麓中心店',4.9,4.6,4.9,'4.80'],['周强','长沙谷山店',4.6,4.5,4.7,'4.60']]
+     .map(x=>'<tr><td><div class="c-person"><div class="av">'+initials(x[0])+'</div><div><div class="nm">'+x[0]+'</div></div></div></td>'+
+       '<td>'+x[1]+'</td><td>'+x[2]+' 星</td><td>'+x[3]+' 星</td><td>'+x[4]+' 星</td>'+
+       '<td><b style="color:var(--orange)">'+x[5]+'</b></td></tr>').join('')+
+    '</tbody></table></div><div class="md-foot"><button class="btn btn-ghost" onclick="closeModal()">关闭</button>'+
+    '<button class="btn btn-primary" onclick="closeModal();toast(\'已导出互评汇总表（原型演示）\')">导出汇总</button></div>';
+  openModalBox(h);
+}
+/* 互评数据明细：筛选 + 谁评谁列表 + 文字评价 */
+function filteredEvalRecords(){
+  return EVAL_RECORDS.filter(r=>{
+    if(EVAL_FILTER.store!=='全部门店' && r.store!==EVAL_FILTER.store) return false;
+    if(EVAL_FILTER.from && r.time<EVAL_FILTER.from) return false;
+    if(EVAL_FILTER.to && r.time>EVAL_FILTER.to) return false;
+    if(EVAL_FILTER.kw){var k=EVAL_FILTER.kw; if(r.from.indexOf(k)<0 && r.to.indexOf(k)<0) return false;}
+    return true;
+  });
+}
+function renderEvalDetailBody(){
+  var sel=document.getElementById('evalStoreSel'),frm=document.getElementById('evalFrom'),
+      to=document.getElementById('evalTo'),kw=document.getElementById('evalKw');
+  if(sel)sel.value=EVAL_FILTER.store; if(frm)frm.value=EVAL_FILTER.from;
+  if(to)to.value=EVAL_FILTER.to; if(kw)kw.value=EVAL_FILTER.kw;
+  var rows=filteredEvalRecords(),body=document.getElementById('evalDetailBody'); if(!body)return;
+  if(!rows.length){body.innerHTML='<div class="empty">当前筛选条件下暂无互评数据</div>';return;}
+  var h='<div class="tw"><table class="tb"><thead><tr>'+
+    '<th>评价人</th><th>被评价人</th><th>门店</th><th>服务态度</th><th>专业能力</th><th>协作配合</th><th>综合得分</th><th>评价时间</th><th>操作</th></tr></thead><tbody>'+
+    rows.map(function(r,i){
+      var score=((r.att+r.pro+r.col)/3).toFixed(2);
+      return '<tr><td><div class="c-person"><div class="av">'+initials(r.from)+'</div>'+
+          '<div><div class="nm">'+r.from+'</div><div class="rl">'+r.fr+'</div></div></div></td>'+
+        '<td><div class="c-person"><div class="av">'+initials(r.to)+'</div>'+
+          '<div><div class="nm">'+r.to+'</div><div class="rl">'+r.tr+'</div></div></div></td>'+
+        '<td>'+r.store+'</td>'+
+        '<td>'+r.att.toFixed(1)+' 星</td><td>'+r.pro.toFixed(1)+' 星</td><td>'+r.col.toFixed(1)+' 星</td>'+
+        '<td><b style="color:var(--orange)">'+score+'</b></td>'+
+        '<td>'+r.time+'</td>'+
+        '<td><div class="ops"><button class="btn btn-ghost btn-sm" onclick="openEvalComment('+i+')">查看文字评价</button></div></td></tr>';
+    }).join('')+'</tbody></table></div>'+
+    '<div class="pager"><div class="lf">共 '+rows.length+' 条互评记录（综合得分 = 三维平均）</div></div>';
+  body.innerHTML=h;
+}
+function evalApplyFilter(){
+  var sel=document.getElementById('evalStoreSel'),frm=document.getElementById('evalFrom'),
+      to=document.getElementById('evalTo'),kw=document.getElementById('evalKw');
+  if(sel)EVAL_FILTER.store=sel.value;
+  if(frm)EVAL_FILTER.from=frm.value;
+  if(to)EVAL_FILTER.to=to.value;
+  if(kw)EVAL_FILTER.kw=(kw.value||'').trim();
+  renderEvalDetailBody();
+}
+function evalResetFilter(){
+  EVAL_FILTER={store:'全部门店',from:'',to:'',kw:''};
+  renderEvalTasks('evalTasks');
+}
+function evalStoreFocus(name){
+  EVAL_FILTER={store:name,from:'',to:'',kw:''};
+  renderEvalTasks('evalTasks');
+  setTimeout(function(){var p=document.getElementById('evalDetailPanel');if(p)p.scrollIntoView({behavior:'smooth',block:'start'});},80);
+}
+function evalExport(){ toast('已导出互评明细（'+filteredEvalRecords().length+' 条，原型演示）'); }
+function openEvalComment(i){
+  var r=filteredEvalRecords()[i]; if(!r)return;
+  var score=((r.att+r.pro+r.col)/3).toFixed(2);
+  var h='<div class="md-head"><div style="flex:1"><h3>互评文字评价</h3>'+
+    '<div class="sub">'+r.from+'（'+r.fr+'）→ '+r.to+'（'+r.tr+'） · '+r.store+' · '+r.time+'</div></div>'+
+    '<button class="x" onclick="closeModal()">✕</button></div><div class="md-body">'+
+    '<div class="kv"><div class="k">评价人</div><div class="v">'+r.from+'（'+r.fr+'）</div></div>'+
+    '<div class="kv"><div class="k">被评价人</div><div class="v">'+r.to+'（'+r.tr+'）</div></div>'+
+    '<div class="kv"><div class="k">服务态度</div><div class="v">'+r.att.toFixed(1)+' 星</div></div>'+
+    '<div class="kv"><div class="k">专业能力</div><div class="v">'+r.pro.toFixed(1)+' 星</div></div>'+
+    '<div class="kv"><div class="k">协作配合</div><div class="v">'+r.col.toFixed(1)+' 星</div></div>'+
+    '<div class="kv"><div class="k">综合得分</div><div class="v"><b style="color:var(--orange)">'+score+'</b></div></div>'+
+    '<div class="kv" style="align-items:flex-start"><div class="k">文字评价</div><div class="v" style="font-weight:500;line-height:1.6">'+ (r.cm||'（未填写文字评价）') +'</div></div>'+
+    '</div><div class="md-foot"><button class="btn btn-primary" onclick="closeModal()">关闭</button></div>';
+  openModalBox(h);
+}
+
+/* ================= 7. 角色权限 ================= */
+const ROLES=['超级管理员','运营管理员','门店管理员','财务','品牌专员'];
+let ROLE_CUR='超级管理员';
+const PERMS=['查看','新增','编辑','删除','导出','审核'];
+const ROLE_PRESET={
+ '超级管理员':{all:1},
+ '运营管理员':{all:0,allow:{dashboard:1,stores:1,members:1,appts:1,orders:1,coupons:1,voucher:0,campaigns:1,reviews:1,complaints:1,content:1,evalTasks:1,goods:1,services:1}},
+ '门店管理员':{all:0,allow:{dashboard:1,stores:0,staff:1,members:1,appts:1,orders:1,cards:1,schedule:1,reviews:1,complaints:1}},
+ '财务':{all:0,allow:{dashboard:1,orders:1,withdrawals:1,logs:1}},
+ '品牌专员':{all:0,allow:{dashboard:1,content:1,notifications:1}}
+};
+function renderRoles(id){
+  let h=phHead('角色权限','按角色配置菜单与数据权限；越权访问会被拦截并记录到操作日志',
+    '<button class="btn btn-ghost" onclick="toast(\'已导出权限矩阵（原型演示）\')">导出权限矩阵</button>'+
+    '<button class="btn btn-primary" onclick="toast(\'角色权限已保存，相关账号下次登录生效\')">'+svgIcon('checkCircle',14)+'保存权限</button>');
+  h+=statCards([
+    {lb:'角色数量',vl:'5',u:'个',sb:'覆盖 24 个后台账号',i:'shield',c:'#7C3AED'},
+    {lb:'高权限角色',vl:'2',u:'个',sb:'超级管理员 / 运营管理员',i:'key',c:'#F0532B',cls:'hl'},
+    {lb:'可管理模块',vl:'27',u:'个',sb:'5 大分组',i:'grid',c:'#2563EB'},
+    {lb:'越权拦截（月）',vl:'2',u:'次',sb:'均由门店管理员触发',i:'alert',c:'#EF4444'}
+  ]);
+  h+='<div class="panel"><div class="pn-head"><div class="tt">当前角色</div><div class="sp">'+
+     '<div class="seg">'+ROLES.map(r=>'<button class="'+(r===ROLE_CUR?'on':'')+'" onclick="ROLE_CUR=\''+r+'\';renderRoles(\'roles\')">'+r+'</button>').join('')+'</div>'+
+     '</div></div>';
+  h+='<div class="hit">角色说明：<b>'+(ROLE_CUR==='超级管理员'?'拥有全部模块与数据权限，含敏感操作与权限配置能力':
+     ROLE_CUR==='运营管理员'?'负责日常运营与营销配置，不可修改系统权限与券包金额配置':
+     ROLE_CUR==='门店管理员'?'仅本店数据与日常排班、预约、评价处理，无财务与权限入口':
+     ROLE_CUR==='财务'?'订单退款、佣金提现打款与结算报表，无业务配置权限':
+     '内容与推广内容录入与推送配置，无经营数据权限')+'</b><span class="ck">共 27 个模块 · 6 类操作权限</span></div>';
+  h+='<div class="tw"><table class="tb matrix"><thead><tr><th>模块</th>'+PERMS.map(p=>'<th>'+p+'</th>').join('')+'</tr></thead><tbody>';
+  MENU.forEach(g=>{
+    h+='<tr><td colspan="'+(PERMS.length+1)+'" style="background:#FAFAFC;font-weight:800;color:var(--txt);font-size:12px">'+g.g+'</td></tr>';
+    g.items.forEach(mid=>{
+      const m=MOD[mid];
+      const pset=ROLE_PRESET[ROLE_CUR];
+      const on=pset.all?true:!!(pset.allow&&pset.allow[mid]);
+      h+='<tr><td><div style="display:flex;align-items:center;gap:8px;font-weight:700;color:var(--txt)">'+
+         svgIcon(m.i,14,'#7C3AED')+m.n+'</div></td>';
+      PERMS.forEach(p=>{
+        const editable=ROLE_CUR!=='超级管理员'&&!(p==='查看'&&on===false);
+        h+='<td><input type="checkbox" '+(on?'checked':'')+' '+(ROLE_CUR==='超级管理员'?'disabled':'')+
+           ' onchange="permChange(\''+mid+'\',\''+p+'\',this.checked)"></td>';
+      });
+      h+='</tr>';
+    });
+  });
+  h+='</tbody></table></div><div class="pager" style="border-top:1px solid var(--line)">'+
+     '超级管理员权限不可取消（保证系统始终可管理）<div class="sp">'+
+     '<button class="btn btn-ghost btn-sm" onclick="toast(\'已全选当前角色全部权限\')">全选</button>'+
+     '<button class="btn btn-ghost btn-sm" onclick="toast(\'已清空当前角色全部权限\')">清空</button>'+
+     '<button class="btn btn-primary btn-sm" onclick="toast(\'角色权限已保存\')">保存权限</button></div></div></div>';
+  document.getElementById('pg_'+id).innerHTML=h;
+}
+function permChange(mid,p,on){toast('权限已调整：'+MOD[mid].n+' · '+p+(on?' 开启':' 关闭'));}
+
+/* ================= 8. 系统设置 ================= */
+let SET_TAB='base';
+function renderSettings(id){
+  let h=phHead('系统设置','基础参数、小程序配置、支付与规则、消息通知与协议；修改后同步至小程序端与员工端',
+    '<button class="btn btn-ghost" onclick="toast(\'已重置为上次保存的配置\')">重置</button>'+
+    '<button class="btn btn-primary" onclick="toast(\'系统设置已保存并同步\')">'+svgIcon('checkCircle',14)+'保存设置</button>');
+  h+=statCards([
+    {lb:'小程序版本',vl:'v2.4.1',u:'',sb:'已发布 · 灰度 10%',i:'grid',c:'#7C3AED'},
+    {lb:'最近同步时间',vl:'09-15 11:02',u:'',sb:'同步成功',i:'checkCircle',c:'#0F9E56'},
+    {lb:'开启中的通知模板',vl:'14',u:'个',sb:'订阅消息 11 · 短信 3',i:'bell',c:'#2563EB'},
+    {lb:'待处理配置项',vl:'2',u:'项',sb:'待补充小程序 AppID 审核材料',i:'alert',c:'#F0532B',cls:'hl'}
+  ]);
+  h+='<div class="panel"><div class="tabs">'+
+     [['base','基础信息'],['mp','小程序配置'],['pay','支付与规则'],['notify','通知配置'],['agreement','协议与隐私']]
+     .map(x=>'<button class="'+(SET_TAB===x[0]?'on':'')+'" onclick="SET_TAB=\''+x[0]+'\';renderSettings(\'settings\')">'+x[1]+'</button>').join('')+
+     '</div><div class="md-body" style="padding:18px 16px 20px">';
+  if(SET_TAB==='base'){
+    h+='<div class="form-grid">'+
+      '<div class="fi"><label>品牌名称<i>*</i></label><input value="了凡乐享"></div>'+
+      '<div class="fi"><label>品牌简称</label><input value="了凡乐享"></div>'+
+      '<div class="fi"><label>客服电话</label><input value="400-800-6688"></div>'+
+      '<div class="fi"><label>客服工作时间</label><input value="09:00 – 21:00（全年）"></div>'+
+      '<div class="fi"><label>总部地址</label><input value="湖南省长沙市岳麓区枫林三路 238 号"></div>'+
+      '<div class="fi"><label>统一社会信用代码</label><input value="91430100MA4L****XK"></div>'+
+      '<div class="fi full"><label>品牌介绍（小程序端「关于我们」展示）</label><textarea>了凡乐享专注运动损伤、术后康复、慢性疼痛与脑科学训练，以「评估—训练—康复—再评估」闭环为每一位用户提供个性化康复方案。</textarea></div>'+
+      '</div>';
+  }else if(SET_TAB==='mp'){
+    h+='<div class="form-grid">'+
+      '<div class="fi"><label>小程序 AppID</label><input value="wx8f2c****4d1a"></div>'+
+      '<div class="fi"><label>小程序版本</label><input value="v2.4.1（已发布）"></div>'+
+      '<div class="fi"><label>首页 Banner 数量</label><select><option>3 张（自动轮播）</option><option>5 张</option></select></div>'+
+      '<div class="fi"><label>首页金刚区入口</label><select><option>4 个（服务 / 商城 / 康复师 / 自测）</option><option>6 个</option></select></div>'+
+      '<div class="fi"><label>门店可见范围</label><select><option>全部营业中门店</option><option>仅开通服务的门店</option></select></div>'+
+      '<div class="fi"><label>用户注册方式</label><select><option>手机号 + 微信一键登录</option><option>仅手机号注册</option></select></div>'+
+      '<div class="fi"><label>分销推广员入口</label><select><option>仅后台设定的推广员可见</option><option>全部用户可见</option></select></div>'+
+      '<div class="fi"><label>券包展示方式</label><select><option>仅在「我的优惠券」中以券形式展示</option></select></div>'+
+      '<div class="fi full"><label>版本更新说明</label><textarea>1. 新增门店月度互评任务；2. 优化改期流程，支持提前 2 小时自助改期；3. 券包抵扣结算优化。</textarea></div>'+
+      '</div>';
+  }else if(SET_TAB==='pay'){
+    h+='<div class="form-grid">'+
+      '<div class="fi"><label>微信支付商户号</label><input value="1***8899"></div>'+
+      '<div class="fi"><label>支付方式</label><select><option>微信支付</option><option>微信支付 + 余额</option></select></div>'+
+      '<div class="fi"><label>用户端自助改期时限</label><select><option>提前 2 小时可自助改期</option><option>提前 4 小时</option><option>不可自助改期</option></select></div>'+
+      '<div class="fi"><label>免费取消时限</label><select><option>提前 4 小时免费取消</option><option>提前 24 小时</option></select></div>'+
+      '<div class="fi"><label>爽约扣次规则</label><select><option>超时 30 分钟未到店扣 1 次</option><option>不扣次，仅记录</option></select></div>'+
+      '<div class="fi"><label>退款规则</label><select><option>已核销按剩余次数折算退款</option><option>不支持退款</option></select></div>'+
+      '<div class="fi"><label>券包抵扣上限</label><select><option>单笔最多抵扣套餐金额的 30%</option><option>不限制</option></select></div>'+
+      '<div class="fi"><label>券包是否可提现</label><select><option>不可提现，仅可抵扣</option></select></div>'+
+      '<div class="fi full"><label>发票说明</label><textarea>支持开具电子普通发票，订单完成后可在小程序「我的订单」中申请，3 个工作日内开具。</textarea></div>'+
+      '</div>';
+  }else if(SET_TAB==='notify'){
+    h+='<div class="tw"><table class="tb"><thead><tr><th>通知场景</th><th>通知方式</th><th>接收对象</th><th>状态</th></tr></thead><tbody>'+
+      [['预约成功通知','订阅消息','用户','已开启'],['到店前 2 小时提醒','订阅消息','用户','已开启'],
+       ['核销成功通知','站内消息','用户','已开启'],['券包到账提醒','订阅消息','用户','已开启'],
+       ['卡项到期提醒','短信通知','用户','已开启'],['评价邀约','订阅消息','用户','已开启'],
+       ['互评任务下发提醒','订阅消息','员工','已开启'],['待办超时提醒','站内消息','管理员','已开启'],
+       ['提现打款完成通知','短信通知','推广员','已开启'],['门店营收日报','站内消息','店长','已关闭']]
+      .map(x=>'<tr><td style="font-weight:700;color:var(--txt)">'+x[0]+'</td><td>'+x[1]+'</td><td>'+x[2]+'</td>'+
+        '<td><div class="switch '+(x[3]==='已开启'?'on':'')+'" onclick="sw(this)"><i></i></div></td></tr>').join('')+
+      '</tbody></table></div>';
+  }else{
+    h+='<div class="form-grid">'+
+      '<div class="fi"><label>用户服务协议</label><div style="display:flex;gap:10px"><input value="user-agreement-v3" style="flex:1"><button class="btn btn-ghost">查看</button></div></div>'+
+      '<div class="fi"><label>隐私政策</label><div style="display:flex;gap:10px"><input value="privacy-v3" style="flex:1"><button class="btn btn-ghost">查看</button></div></div>'+
+      '<div class="fi"><label>健康档案数据留存</label><select><option>服务结束后留存 5 年</option><option>留存 3 年</option></select></div>'+
+      '<div class="fi"><label>敏感数据脱敏</label><select><option>后台手机号默认脱敏展示</option><option>完整展示</option></select></div>'+
+      '<div class="fi full"><label>注销账号规则说明</label><textarea>用户可在小程序「我的 – 设置」中申请注销账号；注销后卡项余额将按退款规则处理，健康档案数据将被匿名化处理。</textarea></div>'+
+      '</div>';
+  }
+  h+='</div><div class="pager" style="border-top:1px solid var(--line)">'+
+     '配置修改会记录到操作日志，敏感配置需二次校验<div class="sp">'+
+     '<button class="btn btn-ghost btn-sm" onclick="toast(\'已恢复默认配置\')">恢复默认</button>'+
+     '<button class="btn btn-primary btn-sm" onclick="toast(\'当前分组设置已保存\')">保存当前分组</button></div></div></div>';
+  document.getElementById('pg_'+id).innerHTML=h;
+}
+
+/* ---------- 调试桥（便于自动化校验，不影响页面功能） ---------- */
+window.APP={T:T,MOD:MOD,MENU:MENU,S:S,VPKG:VPKG,PT_RULES:PT_RULES,ROLE_PRESET:ROLE_PRESET,EVAL_STORES:EVAL_STORES,
+  EVAL_RECORDS:EVAL_RECORDS,getEvalFilter:()=>EVAL_FILTER,filteredEvalRecords:filteredEvalRecords,
+  setPT:t=>{PT_TAB=t;},getPT:()=>PT_TAB,setSET:t=>{SET_TAB=t;},setRole:r=>{ROLE_CUR=r;},isEvalOn:()=>EVAL_ON};
+
+/* ---------- 启动 ---------- */
+renderSidebar();
+renderCrumb();
+go('dashboard');
+</script>
+</body>
+</html>
