@@ -589,19 +589,20 @@ members:{key:'id',addLb:'新增用户',addForm:'member',
        {k:'ops',t:'操作',ty:'ops'}],
  ops:[{t:'详情',fn:'detail'},{t:'调积点',fn:'custom:points'},{t:'冻结',fn:'toggle'}],
  rows:[
-  {id:'U2001',name:'林小凡',phone:'138****2001',level:'黑金',store:'长沙岳麓中心店',cards:12,points:2680,growth:8860,spend:'¥42,860',last:'2026-09-14',status:'正常'},
-  {id:'U2002',name:'王小明',phone:'139****2002',level:'银卡',store:'长沙谷山店',cards:4,points:620,growth:2140,spend:'¥9,240',last:'2026-09-13',status:'正常'},
-  {id:'U2003',name:'陈一鸣',phone:'137****2003',level:'金卡',store:'长沙岳麓中心店',cards:7,points:1180,growth:4620,spend:'¥18,600',last:'2026-09-12',status:'正常'},
-  {id:'U2004',name:'周雨彤',phone:'136****2004',level:'金卡',store:'深圳南山旗舰店',cards:9,points:1560,growth:5380,spend:'¥22,180',last:'2026-09-15',status:'正常'},
-  {id:'U2005',name:'刘亦辰',phone:'135****2005',level:'普通会员',store:'武汉光谷店',cards:1,points:210,growth:380,spend:'¥1,980',last:'2026-09-10',status:'正常'},
-  {id:'U2006',name:'李佳',phone:'133****2006',level:'银卡',store:'广州天河店',cards:3,points:840,growth:2760,spend:'¥7,860',last:'2026-08-30',status:'正常'},
-  {id:'U2007',name:'黄思远',phone:'132****2007',level:'普通会员',store:'成都天府三街店',cards:0,points:60,growth:120,spend:'¥560',last:'2026-08-18',status:'正常'},
-  {id:'U2008',name:'杨阳',phone:'131****2008',level:'普通会员',store:'长沙梅溪湖店',cards:2,points:320,growth:640,spend:'¥3,200',last:'2026-09-01',status:'异常'},
-  {id:'U2009',name:'赵婷婷',phone:'130****2009',level:'银卡',store:'长沙岳麓中心店',cards:5,points:980,growth:3240,spend:'¥11,400',last:'2026-09-08',status:'正常'}
+  {id:'U2001',name:'林小凡',phone:'138****2001',level:'黑金',store:'长沙岳麓中心店',cards:12,points:2680,growth:8860,spend:'¥42,860',last:'2026-09-14',status:'正常',age:34,gender:'男'},
+  {id:'U2002',name:'王小明',phone:'139****2002',level:'银卡',store:'长沙谷山店',cards:4,points:620,growth:2140,spend:'¥9,240',last:'2026-09-13',status:'正常',age:28,gender:'男'},
+  {id:'U2003',name:'陈一鸣',phone:'137****2003',level:'金卡',store:'长沙岳麓中心店',cards:7,points:1180,growth:4620,spend:'¥18,600',last:'2026-09-12',status:'正常',age:41,gender:'男'},
+  {id:'U2004',name:'周雨彤',phone:'136****2004',level:'金卡',store:'深圳南山旗舰店',cards:9,points:1560,growth:5380,spend:'¥22,180',last:'2026-09-15',status:'正常',age:29,gender:'女'},
+  {id:'U2005',name:'刘亦辰',phone:'135****2005',level:'普通会员',store:'武汉光谷店',cards:1,points:210,growth:380,spend:'¥1,980',last:'2026-09-10',status:'正常',age:25,gender:'男'},
+  {id:'U2006',name:'李佳',phone:'133****2006',level:'银卡',store:'广州天河店',cards:3,points:840,growth:2760,spend:'¥7,860',last:'2026-08-30',status:'正常',age:36,gender:'女'},
+  {id:'U2007',name:'黄思远',phone:'132****2007',level:'普通会员',store:'成都天府三街店',cards:0,points:60,growth:120,spend:'¥560',last:'2026-08-18',status:'正常',age:22,gender:'男'},
+  {id:'U2008',name:'杨阳',phone:'131****2008',level:'普通会员',store:'长沙梅溪湖店',cards:2,points:320,growth:640,spend:'¥3,200',last:'2026-09-01',status:'异常',age:31,gender:'女'},
+  {id:'U2009',name:'赵婷婷',phone:'130****2009',level:'银卡',store:'长沙岳麓中心店',cards:5,points:980,growth:3240,spend:'¥11,400',last:'2026-09-08',status:'正常',age:27,gender:'女'}
  ],
  form:[{k:'name',l:'姓名',t:'text',req:1},{k:'phone',l:'手机号',t:'text',req:1},
        {k:'level',l:'会员等级',t:'select',o:['普通会员','银卡','金卡','黑金']},
        {k:'store',l:'归属门店',t:'select',o:['长沙岳麓中心店','长沙谷山店','长沙梅溪湖店','武汉光谷店','深圳南山旗舰店','广州天河店']},
+       {k:'age',l:'年龄',t:'num'},{k:'gender',l:'性别',t:'select',o:['男','女']},
        {k:'cards',l:'剩余卡次',t:'num'},{k:'points',l:'积点',t:'num'},
        {k:'growth',l:'成长值',t:'num'},{k:'status',l:'状态',t:'select',o:['正常','异常']},
        {k:'note',l:'备注',t:'textarea',full:1}]
@@ -1212,6 +1213,67 @@ logs:{key:'id',addLb:'',addForm:'',
  form:[]
 }
 };
+/* 客户扩展资料：卡项订单 / 商品订单 / 康复档案（按会员 ID 索引） */
+const MEMBER_EXT={
+ U2001:{cardOrders:[
+    {no:'C2026082001',item:'康复套餐·20次卡',store:'长沙岳麓中心店',date:'2026-08-20',amount:'¥9,800',remain:'12 次'},
+    {no:'C2026071501',item:'肩颈调理·10次卡',store:'长沙岳麓中心店',date:'2026-07-15',amount:'¥4,200',remain:'3 次'}],
+   productOrders:[
+    {no:'P2026090201',item:'筋膜枪 Pro 深层放松款',date:'2026-09-02',qty:1,amount:'¥899'}],
+   rehab:[
+    {date:'2026-09-14',item:'运动损伤康复',therapist:'王兴权',note:'右膝活动度改善至 120°，疼痛 VAS 由 5 分降至 2 分，继续强化臀中肌训练。'},
+    {date:'2026-09-07',item:'运动损伤康复',therapist:'王兴权',note:'步态评估：右侧支撑相缩短，已加入单腿稳定性训练。'}]},
+ U2002:{cardOrders:[
+    {no:'C2026080802',item:'颈肩腰腿痛·8次卡',store:'长沙谷山店',date:'2026-08-08',amount:'¥3,200',remain:'4 次'}],
+   productOrders:[
+    {no:'P2026090102',item:'热敷理疗护腰带',date:'2026-09-01',qty:1,amount:'¥259'}],
+   rehab:[
+    {date:'2026-09-13',item:'颈肩腰腿痛调理',therapist:'李娜',note:'颈椎活动受限 NRS 3 分，予手法松解 + 拉伸，建议日常减少低头时长。'}]},
+ U2003:{cardOrders:[
+    {no:'C2026072503',item:'康复套餐·20次卡',store:'长沙岳麓中心店',date:'2026-07-25',amount:'¥9,800',remain:'7 次'},
+    {no:'C2026061003',item:'体态矫正·12次卡',store:'长沙岳麓中心店',date:'2026-06-10',amount:'¥6,600',remain:'5 次'}],
+   productOrders:[],
+   rehab:[
+    {date:'2026-09-12',item:'体态矫正训练',therapist:'王兴权',note:'高低肩较前改善，骨盆左倾角度由 8° 降至 4°，继续核心稳定训练。'},
+    {date:'2026-09-05',item:'体态矫正训练',therapist:'王兴权',note:'予呼吸训练与腹横肌激活，久坐后腰痛频率下降。'}]},
+ U2004:{cardOrders:[
+    {no:'C2026081804',item:'康复套餐·20次卡',store:'深圳南山旗舰店',date:'2026-08-18',amount:'¥12,000',remain:'9 次'},
+    {no:'C2026052004',item:'产后康复·10次卡',store:'深圳南山旗舰店',date:'2026-05-20',amount:'¥5,800',remain:'2 次'}],
+   productOrders:[
+    {no:'P2026091004',item:'骨盆修复瑜伽球',date:'2026-09-10',qty:1,amount:'¥159'},
+    {no:'P2026082804',item:'低频理疗仪',date:'2026-08-28',qty:1,amount:'¥1,299'}],
+   rehab:[
+    {date:'2026-09-15',item:'产后康复',therapist:'唐琪',note:'腹直肌分离由 2.5 指恢复至 1.5 指，核心力量提升，凯格尔训练达成率 80%。'},
+    {date:'2026-09-08',item:'产后康复',therapist:'唐琪',note:'盆底肌评估改善，漏尿症状基本消失。'}]},
+ U2005:{cardOrders:[
+    {no:'C2026090105',item:'单次体验卡',store:'武汉光谷店',date:'2026-09-01',amount:'¥198',remain:'1 次'}],
+   productOrders:[],
+   rehab:[
+    {date:'2026-09-10',item:'运动损伤评估',therapist:'刘洋',note:'首次评估：右侧踝背屈受限，建议先完成 3 次松解再制定训练计划。'}]},
+ U2006:{cardOrders:[
+    {no:'C2026080506',item:'颈肩腰腿痛·8次卡',store:'广州天河店',date:'2026-08-05',amount:'¥3,200',remain:'3 次'}],
+   productOrders:[
+    {no:'P2026083006',item:'便携筋膜放松轴',date:'2026-08-30',qty:1,amount:'¥99'}],
+   rehab:[
+    {date:'2026-09-08',item:'颈肩腰腿痛调理',therapist:'黄志强',note:'腰椎小关节紊乱缓解，旋转活动度恢复，居家麦肯基训练执行良好。'}]},
+ U2007:{cardOrders:[],
+   productOrders:[],
+   rehab:[
+    {date:'2026-08-18',item:'体态筛查',therapist:'郑凯',note:'筛查提示轻度圆肩，暂无疼痛，建议预防性拉伸，暂不介入训练。'}]},
+ U2008:{cardOrders:[
+    {no:'C2026082008',item:'拉伸放松·6次卡',store:'长沙梅溪湖店',date:'2026-08-20',amount:'¥1,800',remain:'2 次'}],
+   productOrders:[],
+   rehab:[
+    {date:'2026-09-01',item:'拉伸放松',therapist:'李明',note:'长期久坐久坐腰背僵硬，予全身拉伸，放松后活动度改善；账户存在异常登录已风控。'}]},
+ U2009:{cardOrders:[
+    {no:'C2026072809',item:'康复套餐·20次卡',store:'长沙岳麓中心店',date:'2026-07-28',amount:'¥9,800',remain:'5 次'}],
+   productOrders:[
+    {no:'P2026090509',item:'运动护膝（一对）',date:'2026-09-05',qty:1,amount:'¥199'}],
+   rehab:[
+    {date:'2026-09-08',item:'运动损伤康复',therapist:'李娜',note:'膝关节韧带松弛度改善，本体感觉训练完成度 70%，继续平衡板训练。'},
+    {date:'2026-09-01',item:'运动损伤康复',therapist:'李娜',note:'肿胀消退，已恢复低强度有氧。'}]}
+};
+
 </script>
 <script>
 /* ============================================================
@@ -1591,16 +1653,47 @@ function openDetail(mid,idx){
     h+='<div class="k">'+x.t+'</div><div class="v">'+v+'</div>';
     if(x.sub&&r[x.sub])h+='<div class="k">补充信息</div><div class="v" style="font-weight:500;color:var(--txt2)">'+esc(r[x.sub])+'</div>';
   });
+  if(mid==='members'){
+    h+='<div class="k">客户年龄</div><div class="v">'+esc((r.age!=null&&r.age!=='')?r.age+' 岁':'—')+'</div>';
+    h+='<div class="k">性别</div><div class="v">'+esc(r.gender||'—')+'</div>';
+  }
   h+='</div>';
-  h+='<div class="sec-t">关联记录</div><div style="padding:0 20px 16px">';
-  h+='<div class="hint-box">'+svgIcon('link',15,'#5B26A8',2)+'<div>该记录已关联小程序端页面展示；任何修改都会写入操作日志并保留 180 天审计痕迹。</div></div>';
-  h+='<table class="tb" style="border:1px solid var(--line);border-radius:12px;overflow:hidden"><thead><tr><th>时间</th><th>动作</th><th>操作人</th></tr></thead><tbody>'+
-     '<tr><td>2026-09-15 10:24</td><td>创建记录</td><td>王立群</td></tr>'+
-     '<tr><td>2026-09-15 10:48</td><td>修改关键字段</td><td>王立群</td></tr>'+
-     '<tr><td>2026-09-15 11:02</td><td>审核通过</td><td>刘敏</td></tr></tbody></table></div>';
+  if(mid==='members'){
+    h+=memberDetailSections(r);
+  } else {
+    h+='<div class="sec-t">关联记录</div><div style="padding:0 20px 16px">';
+    h+='<div class="hint-box">'+svgIcon('link',15,'#5B26A8',2)+'<div>该记录已关联小程序端页面展示；任何修改都会写入操作日志并保留 180 天审计痕迹。</div></div>';
+    h+='<table class="tb" style="border:1px solid var(--line);border-radius:12px;overflow:hidden"><thead><tr><th>时间</th><th>动作</th><th>操作人</th></tr></thead><tbody>'+
+       '<tr><td>2026-09-15 10:24</td><td>创建记录</td><td>王立群</td></tr>'+
+       '<tr><td>2026-09-15 10:48</td><td>修改关键字段</td><td>王立群</td></tr>'+
+       '<tr><td>2026-09-15 11:02</td><td>审核通过</td><td>刘敏</td></tr></tbody></table></div>';
+  }
   h+='</div><div class="dw-foot"><button class="btn btn-ghost" onclick="toast(\'已导出详情（原型演示）\')">导出</button>'+
      '<button class="btn btn-primary" onclick="closeDrawer();openForm(\''+mid+'\','+idx+')">编辑</button></div>';
   openDrawer(h);
+}
+function memberDetailSections(r){
+  const ex=MEMBER_EXT[r.id]||{cardOrders:[],productOrders:[],rehab:[]};
+  let h='';
+  h+='<div class="sec-t">卡项订单记录（'+ex.cardOrders.length+' 笔）</div><div style="padding:0 20px 16px">';
+  if(ex.cardOrders.length){
+    h+='<table class="tb" style="border:1px solid var(--line);border-radius:12px;overflow:hidden"><thead><tr><th>订单号</th><th>卡项名称</th><th>归属门店</th><th>下单日期</th><th>金额</th><th>剩余</th></tr></thead><tbody>'+
+       ex.cardOrders.map(o=>'<tr><td>'+o.no+'</td><td>'+esc(o.item)+'</td><td>'+esc(o.store)+'</td><td>'+o.date+'</td><td><span class="money o">'+o.amount+'</span></td><td>'+esc(o.remain)+'</td></tr>').join('')+'</tbody></table>';
+  } else h+='<div class="empty"><div class="em">🧾</div>暂无卡项订单记录</div>';
+  h+='</div>';
+  h+='<div class="sec-t">商品订单记录（'+ex.productOrders.length+' 笔）</div><div style="padding:0 20px 16px">';
+  if(ex.productOrders.length){
+    h+='<table class="tb" style="border:1px solid var(--line);border-radius:12px;overflow:hidden"><thead><tr><th>订单号</th><th>商品名称</th><th>下单日期</th><th>数量</th><th>金额</th></tr></thead><tbody>'+
+       ex.productOrders.map(o=>'<tr><td>'+o.no+'</td><td>'+esc(o.item)+'</td><td>'+o.date+'</td><td>'+o.qty+'</td><td><span class="money o">'+o.amount+'</span></td></tr>').join('')+'</tbody></table>';
+  } else h+='<div class="empty"><div class="em">🛍️</div>暂无商品订单记录</div>';
+  h+='</div>';
+  h+='<div class="sec-t">康复档案（'+ex.rehab.length+' 条）</div><div style="padding:0 20px 16px">';
+  if(ex.rehab.length){
+    h+='<table class="tb" style="border:1px solid var(--line);border-radius:12px;overflow:hidden"><thead><tr><th>日期</th><th>康复项目</th><th>康复师</th><th>记录摘要</th></tr></thead><tbody>'+
+       ex.rehab.map(x=>'<tr><td>'+x.date+'</td><td>'+esc(x.item)+'</td><td>'+esc(x.therapist)+'</td><td style="text-align:left;color:var(--txt2);min-width:240px">'+esc(x.note)+'</td></tr>').join('')+'</tbody></table>';
+  } else h+='<div class="empty"><div class="em">📋</div>暂无康复档案</div>';
+  h+='</div>';
+  return h;
 }
 
 /* ---------- 顶栏交互 ---------- */
@@ -1735,6 +1828,16 @@ function renderDash(id){
     '<div class="seg"><button class="on" onclick="segClick(this)">今日</button><button onclick="segClick(this)">本周</button><button onclick="segClick(this)">本月</button></div>'+
     '<button class="btn btn-ghost" onclick="toast(\'已导出经营日报（原型演示）\')">'+svgIcon('download',14)+'导出日报</button>');
   h+=kpi;
+  h+='<div class="panel"><div class="pn-head"><div class="tt">营业额与消耗<em>（累计口径 / 今日实时）</em></div>'+
+     '<div class="sp"><select class="sel" onchange="toast(\'已切换统计口径\')"><option>全部门店</option><option>直营门店</option><option>联营门店</option></select></div></div>';
+  h+=statCards([
+    {lb:'总营业额（累计）',vl:'¥1,286.4万',sb:'涉及 12 家门店',i:'money',c:'#F0532B'},
+    {lb:'累计已消耗',vl:'¥842.6万',sb:'消耗率 65.5%',i:'coin',c:'#0F9E56',cls:'up'},
+    {lb:'累计未消耗',vl:'¥443.8万',sb:'在途余额（卡项 + 券）',i:'card',c:'#7C3AED'},
+    {lb:'今日总营业额',vl:'¥18.6万',sb:'环比昨日 +12.4%',i:'wallet',c:'#2563EB',cls:'up'},
+    {lb:'今日消耗',vl:'¥9.2万',sb:'核销 / 消耗 ¥9.2 万',i:'receipt',c:'#F0632B'}
+  ]);
+  h+='</div>';
   h+='<div class="chart-grid">';
   h+='<div class="card">'+lineChart(gmv,days,'#F0532B','近 7 日营收趋势（元）','GMV')+'</div>';
   h+='<div class="card" style="padding-bottom:6px"><div class="chart-box" style="padding-bottom:0"><div class="tt">门店营收排行（本月）<span class="lg">TOP 5</span></div></div>'+
@@ -2400,6 +2503,7 @@ function renderSettings(id){
 /* ---------- 调试桥（便于自动化校验，不影响页面功能） ---------- */
 window.APP={T:T,MOD:MOD,MENU:MENU,S:S,VPKG:VPKG,PT_RULES:PT_RULES,ROLE_PRESET:ROLE_PRESET,EVAL_STORES:EVAL_STORES,
   EVAL_RECORDS:EVAL_RECORDS,getEvalFilter:()=>EVAL_FILTER,filteredEvalRecords:filteredEvalRecords,
+  MEMBER_EXT:MEMBER_EXT,
   setPT:t=>{PT_TAB=t;},getPT:()=>PT_TAB,setSET:t=>{SET_TAB=t;},setRole:r=>{ROLE_CUR=r;},isEvalOn:()=>EVAL_ON};
 
 /* ---------- 启动 ---------- */
