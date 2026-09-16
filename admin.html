@@ -244,6 +244,8 @@ table{border-collapse:collapse;width:100%}
 .rank-li .nm{flex:1;min-width:0;font-size:12.5px;font-weight:700;color:var(--txt)}
 .rank-li .nm span{display:block;font-size:11px;color:var(--txt3);font-weight:500;margin-top:2px}
 .rank-li .vv{font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums}
+.rank-li.on{background:var(--p50);box-shadow:inset 3px 0 0 var(--p600)}
+.rank-li.on .nm{color:var(--p700)}
 .todo-li{display:flex;align-items:center;gap:11px;padding:11px 16px;border-bottom:1px solid var(--line);cursor:pointer}
 .todo-li:last-child{border-bottom:none}
 .todo-li:hover{background:#FBFBFE}
@@ -1814,35 +1816,84 @@ function donut(items,title){
 }
 
 /* ================= 1. 数据看板 ================= */
+/* 看板门店口径：全部门店 + 各具体门店（与「门店管理」门店清单一致）
+   切换后看板顶部 KPI 行与「营业额与消耗」面板同步按该口径展示。
+   各门店「累计营业额」合计 = 全部门店 1,286.4 万；「累计已消耗」合计 = 842.6 万。 */
+const DASH_STORES={
+'全部门店':{tot:'¥1,286.4万',totSb:'涉及 12 家门店',used:'¥842.6万',usedSb:'消耗率 65.5%',left:'¥443.8万',
+  gmv:'¥18.6万',gmvSb:'环比昨日 +12.4%',gmvCls:'up',ord:'318',ordSb:'课程套餐 216 · 实物 102',
+  appt:'186',apptSb:'已到店 142 · 待核销 8',cons:'¥9.2万',consSb:'核销 / 消耗 ¥9.2 万'},
+'长沙岳麓中心店':{tot:'¥176.0万',totSb:'占集团 13.7%',used:'¥111.2万',usedSb:'消耗率 63.2%',left:'¥64.8万',
+  gmv:'¥2.5万',gmvSb:'环比昨日 +12.4%',gmvCls:'up',ord:'43',ordSb:'课程套餐 29 · 实物 14',
+  appt:'25',apptSb:'已到店 19 · 待核销 1',cons:'¥1.3万',consSb:'核销 / 消耗 ¥1.3 万'},
+'长沙谷山店':{tot:'¥119.4万',totSb:'占集团 9.3%',used:'¥77.3万',usedSb:'消耗率 64.7%',left:'¥42.1万',
+  gmv:'¥1.7万',gmvSb:'环比昨日 +15.3%',gmvCls:'up',ord:'29',ordSb:'课程套餐 20 · 实物 9',
+  appt:'17',apptSb:'已到店 13 · 待核销 1',cons:'¥0.9万',consSb:'核销 / 消耗 ¥0.9 万'},
+'长沙梅溪湖店':{tot:'¥83.9万',totSb:'占集团 6.5%',used:'¥58.1万',usedSb:'消耗率 69.3%',left:'¥25.8万',
+  gmv:'¥1.2万',gmvSb:'环比昨日 -3.2%',gmvCls:'down',ord:'21',ordSb:'课程套餐 14 · 实物 7',
+  appt:'12',apptSb:'已到店 9 · 待核销 0',cons:'¥0.6万',consSb:'核销 / 消耗 ¥0.6 万'},
+'武汉光谷店':{tot:'¥154.1万',totSb:'占集团 12.0%',used:'¥108.0万',usedSb:'消耗率 70.1%',left:'¥46.1万',
+  gmv:'¥2.2万',gmvSb:'环比昨日 +9.8%',gmvCls:'up',ord:'38',ordSb:'课程套餐 26 · 实物 12',
+  appt:'22',apptSb:'已到店 17 · 待核销 1',cons:'¥1.1万',consSb:'核销 / 消耗 ¥1.1 万'},
+'武汉汉街店':{tot:'¥72.5万',totSb:'占集团 5.6%',used:'¥52.5万',usedSb:'消耗率 72.4%',left:'¥20.0万',
+  gmv:'¥1.1万',gmvSb:'环比昨日 +4.8%',gmvCls:'up',ord:'18',ordSb:'课程套餐 12 · 实物 6',
+  appt:'11',apptSb:'已到店 8 · 待核销 0',cons:'¥0.5万',consSb:'核销 / 消耗 ¥0.5 万'},
+'深圳南山旗舰店':{tot:'¥237.5万',totSb:'占集团 18.5%',used:'¥160.9万',usedSb:'消耗率 67.7%',left:'¥76.6万',
+  gmv:'¥3.4万',gmvSb:'环比昨日 +14.6%',gmvCls:'up',ord:'59',ordSb:'课程套餐 41 · 实物 19',
+  appt:'35',apptSb:'已到店 27 · 待核销 2',cons:'¥1.7万',consSb:'核销 / 消耗 ¥1.7 万'},
+'深圳福田中心店':{tot:'¥143.6万',totSb:'占集团 11.2%',used:'¥95.9万',usedSb:'消耗率 66.8%',left:'¥47.7万',
+  gmv:'¥2.1万',gmvSb:'环比昨日 +11.2%',gmvCls:'up',ord:'36',ordSb:'课程套餐 24 · 实物 12',
+  appt:'21',apptSb:'已到店 16 · 待核销 1',cons:'¥1.0万',consSb:'核销 / 消耗 ¥1.0 万'},
+'广州天河店':{tot:'¥103.5万',totSb:'占集团 8.0%',used:'¥60.2万',usedSb:'消耗率 58.2%',left:'¥43.3万',
+  gmv:'¥1.5万',gmvSb:'环比昨日 +6.4%',gmvCls:'up',ord:'26',ordSb:'课程套餐 18 · 实物 8',
+  appt:'15',apptSb:'已到店 11 · 待核销 1',cons:'¥0.7万',consSb:'核销 / 消耗 ¥0.7 万'},
+'广州珠江新城店':{tot:'¥124.4万',totSb:'占集团 9.7%',used:'¥76.5万',usedSb:'消耗率 61.5%',left:'¥47.9万',
+  gmv:'¥1.8万',gmvSb:'环比昨日 +8.6%',gmvCls:'up',ord:'31',ordSb:'课程套餐 21 · 实物 10',
+  appt:'18',apptSb:'已到店 14 · 待核销 1',cons:'¥0.9万',consSb:'核销 / 消耗 ¥0.9 万'},
+'成都天府三街店':{tot:'¥62.0万',totSb:'占集团 4.8%',used:'¥34.5万',usedSb:'消耗率 55.6%',left:'¥27.5万',
+  gmv:'¥0.9万',gmvSb:'环比昨日 -1.6%',gmvCls:'down',ord:'15',ordSb:'课程套餐 10 · 实物 5',
+  appt:'9',apptSb:'已到店 7 · 待核销 0',cons:'¥0.4万',consSb:'核销 / 消耗 ¥0.4 万'},
+'长沙高铁南站店':{tot:'¥0',totSb:'筹备中 · 暂未开业',used:'¥0',usedSb:'筹备中',left:'¥0',
+  gmv:'¥0',gmvSb:'筹备中，未产生营收',gmvCls:'',ord:'0',ordSb:'筹备中，未产生订单',
+  appt:'0',apptSb:'筹备中，未开放预约',cons:'¥0',consSb:'筹备中，未产生核销'},
+'武汉江汉路店':{tot:'¥9.5万',totSb:'占集团 0.7%',used:'¥7.5万',usedSb:'消耗率 78.9%',left:'¥2.0万',
+  gmv:'¥0.1万',gmvSb:'环比昨日 -22.4%',gmvCls:'down',ord:'2',ordSb:'课程套餐 1 · 实物 1',
+  appt:'1',apptSb:'已到店 1 · 待核销 0',cons:'¥0.1万',consSb:'核销 / 消耗 ¥0.1 万'}
+};
+let DASH_STORE='全部门店';
+function dashScope(){return DASH_STORES[DASH_STORE]||DASH_STORES['全部门店'];}
+function setDashStore(v){DASH_STORE=v;renderDash('dashboard');toast('已切换到「'+v+'」数据');}
+
 function renderDash(id){
+  const sc=dashScope();
   const kpi=statCards([
-    {lb:'今日 GMV',vl:'¥18.6万',sb:'环比昨日 +12.4%',i:'money',c:'#F0532B',cls:'up'},
-    {lb:'今日订单数',vl:'318',u:'单',sb:'课程套餐 216 · 实物 102',i:'receipt',c:'#7C3AED'},
-    {lb:'今日预约',vl:'186',u:'单',sb:'已到店 142 · 待核销 8',i:'calendar',c:'#2563EB'},
-    {lb:'卡项在途余额',vl:'¥486.2万',sb:'涉及 4,187 名会员',i:'card',c:'#0F9E56'}
+    {lb:'今日 GMV',vl:sc.gmv,sb:sc.gmvSb,i:'money',c:'#F0532B',cls:sc.gmvCls},
+    {lb:'今日订单数',vl:sc.ord,u:'单',sb:sc.ordSb,i:'receipt',c:'#7C3AED'},
+    {lb:'今日预约',vl:sc.appt,u:'单',sb:sc.apptSb,i:'calendar',c:'#2563EB'},
+    {lb:'今日消耗',vl:sc.cons,sb:sc.consSb,i:'receipt',c:'#F0632B'}
   ]);
   const days=['09/09','09/10','09/11','09/12','09/13','09/14','09/15'];
   const gmv=[128600,142300,138900,165200,172800,156400,186200];
   const appt=[148,162,156,174,182,168,186];
-  let h=phHead('数据看板','集团整体经营概览 · 数据每 5 分钟同步一次，管理端与门店端口径一致',
+  let h=phHead('数据看板','集团整体经营概览 · 当前门店：'+DASH_STORE+' · 数据每 5 分钟同步一次，管理端与门店端口径一致',
     '<div class="seg"><button class="on" onclick="segClick(this)">今日</button><button onclick="segClick(this)">本周</button><button onclick="segClick(this)">本月</button></div>'+
     '<button class="btn btn-ghost" onclick="toast(\'已导出经营日报（原型演示）\')">'+svgIcon('download',14)+'导出日报</button>');
   h+=kpi;
   h+='<div class="panel"><div class="pn-head"><div class="tt">营业额与消耗<em>（累计口径 / 今日实时）</em></div>'+
-     '<div class="sp"><select class="sel" onchange="toast(\'已切换统计口径\')"><option>全部门店</option><option>直营门店</option><option>联营门店</option></select></div></div>';
+     '<div class="sp"><select class="sel" onchange="setDashStore(this.value)">'+
+       Object.keys(DASH_STORES).map(k=>'<option'+(k===DASH_STORE?' selected':'')+'>'+k+'</option>').join('')+
+     '</select></div></div>';
   h+=statCards([
-    {lb:'总营业额（累计）',vl:'¥1,286.4万',sb:'涉及 12 家门店',i:'money',c:'#F0532B'},
-    {lb:'累计已消耗',vl:'¥842.6万',sb:'消耗率 65.5%',i:'coin',c:'#0F9E56',cls:'up'},
-    {lb:'累计未消耗',vl:'¥443.8万',sb:'在途余额（卡项 + 券）',i:'card',c:'#7C3AED'},
-    {lb:'今日总营业额',vl:'¥18.6万',sb:'环比昨日 +12.4%',i:'wallet',c:'#2563EB',cls:'up'},
-    {lb:'今日消耗',vl:'¥9.2万',sb:'核销 / 消耗 ¥9.2 万',i:'receipt',c:'#F0632B'}
+    {lb:'总营业额（累计）',vl:sc.tot,sb:sc.totSb,i:'money',c:'#F0532B'},
+    {lb:'累计已消耗',vl:sc.used,sb:sc.usedSb,i:'coin',c:'#0F9E56',cls:'up'},
+    {lb:'累计未消耗',vl:sc.left,sb:'在途余额（卡项 + 券）',i:'card',c:'#7C3AED'}
   ]);
   h+='</div>';
   h+='<div class="chart-grid">';
   h+='<div class="card">'+lineChart(gmv,days,'#F0532B','近 7 日营收趋势（元）','GMV')+'</div>';
   h+='<div class="card" style="padding-bottom:6px"><div class="chart-box" style="padding-bottom:0"><div class="tt">门店营收排行（本月）<span class="lg">TOP 5</span></div></div>'+
      [['深圳南山旗舰店','¥52.1万',52.1],['长沙岳麓中心店','¥38.6万',38.6],['武汉光谷店','¥33.8万',33.8],['深圳福田中心店','¥31.5万',31.5],['广州珠江新城店','¥27.3万',27.3]]
-      .map((x,i)=>'<div class="rank-li"><div class="no t'+(i+1)+'">'+(i+1)+'</div><div class="nm">'+x[0]+
+      .map((x,i)=>'<div class="rank-li'+(x[0]===DASH_STORE?' on':'')+'"><div class="no t'+(i+1)+'">'+(i+1)+'</div><div class="nm">'+x[0]+
         '<div class="bar"><i style="width:'+Math.round(x[2]/52.1*100)+'%"></i></div></div><div class="vv">'+x[1]+'</div></div>').join('')+
      '</div>';
   h+='</div>';
@@ -2504,6 +2555,7 @@ function renderSettings(id){
 window.APP={T:T,MOD:MOD,MENU:MENU,S:S,VPKG:VPKG,PT_RULES:PT_RULES,ROLE_PRESET:ROLE_PRESET,EVAL_STORES:EVAL_STORES,
   EVAL_RECORDS:EVAL_RECORDS,getEvalFilter:()=>EVAL_FILTER,filteredEvalRecords:filteredEvalRecords,
   MEMBER_EXT:MEMBER_EXT,
+  DASH_STORES:DASH_STORES,setDashStore:setDashStore,getDashStore:()=>DASH_STORE,dashScope:dashScope,
   setPT:t=>{PT_TAB=t;},getPT:()=>PT_TAB,setSET:t=>{SET_TAB=t;},setRole:r=>{ROLE_CUR=r;},isEvalOn:()=>EVAL_ON};
 
 /* ---------- 启动 ---------- */
